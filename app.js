@@ -13,7 +13,9 @@ const DATA_FILES = {
 
 const state = {
   data: null,
-  activeView: "home"
+  activeView: "home",
+  activeProductCategory: "pre-emergent",
+  activePlanFilter: "focus"
 };
 
 document.addEventListener("DOMContentLoaded", init);
@@ -21,8 +23,10 @@ document.addEventListener("DOMContentLoaded", init);
 async function init() {
   try {
     state.data = await loadData();
+    state.activeProductCategory = state.data.inventory.categories[0]?.id || "pre-emergent";
     renderApp();
     bindNavigation();
+    bindControls();
     showView("home", { focus: false });
   } catch (error) {
     renderLoadError(error);
@@ -50,36 +54,54 @@ function renderApp() {
 
   renderNavigation();
   renderHome();
-  renderSeasonalPlan();
-  renderInventory();
-  renderEquipment();
+  renderPlan();
+  renderProductCategories();
+  renderProducts();
   renderSystems();
-  renderZones();
-  renderReference();
+  renderMore();
 }
 
 function renderNavigation() {
-  const mobileNav = state.data.ui.navigation.map((item) => `
-    <button class="nav-item" type="button" data-nav="${item.id}">
-      <span class="nav-icon" aria-hidden="true">${icon(item.icon)}</span>
-      <span>${escapeHtml(item.shortLabel || item.label)}</span>
-    </button>
-  `).join("");
-
-  const desktopNav = state.data.ui.navigation.map((item) => `
-    <button class="nav-item" type="button" data-nav="${item.id}">
-      <span class="nav-icon" aria-hidden="true">${icon(item.icon)}</span>
-      <span>${escapeHtml(item.label)}</span>
-    </button>
-  `).join("");
-
-  document.querySelector("#desktop-nav").innerHTML = desktopNav;
+  const nav = state.data.ui.navigation;
+  const mobileNav = nav.map((item) => navButton(item, item.shortLabel || item.label)).join("");
+  const desktopNav = nav.map((item) => navButton(item, item.label)).join("");
   document.querySelector("#bottom-nav").innerHTML = mobileNav;
+  document.querySelector("#desktop-nav").innerHTML = desktopNav;
+}
+
+function navButton(item, label) {
+  return `
+    <button class="nav-item" type="button" data-nav="${item.id}">
+      <span class="nav-icon" aria-hidden="true">${icon(item.icon)}</span>
+      <span>${escapeHtml(label)}</span>
+    </button>
+  `;
 }
 
 function bindNavigation() {
   document.querySelectorAll("[data-nav]").forEach((button) => {
     button.addEventListener("click", () => showView(button.dataset.nav));
+  });
+
+  document.querySelectorAll("[data-nav-target]").forEach((button) => {
+    button.addEventListener("click", () => showView(button.dataset.navTarget));
+  });
+}
+
+function bindControls() {
+  document.querySelector("#product-category-strip").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-product-category]");
+    if (!button) return;
+    state.activeProductCategory = button.dataset.productCategory;
+    renderProductCategories();
+    renderProducts();
+  });
+
+  document.querySelector("#plan-filters").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-plan-filter]");
+    if (!button) return;
+    state.activePlanFilter = button.dataset.planFilter;
+    renderPlan();
   });
 }
 
@@ -104,224 +126,192 @@ function renderHome() {
   const { profile, tasks, inventory } = state.data;
   const season = profile.currentSeason;
   const nowTasks = tasks.tasks.filter((task) => task.status === "now");
-  const nextTasks = tasks.tasks.filter((task) => task.status === "next").slice(0, 4);
-  const buyTasks = tasks.tasks.filter((task) => task.status === "buy-soon" || task.category === "prep / buying").slice(0, 4);
+  const nextTasks = tasks.tasks.filter((task) => task.status === "next");
+  const buyTasks = buyPrepTasks().slice(0, 3);
 
   text("#home-window", `${season.window} / ${formatDate(season.asOf)}`);
-  text("#home-summary", season.summary);
   text("#current-phase-title", season.label);
-  text("#current-phase-copy", season.nowFocus.join(" "));
+  text("#current-phase-copy", concise(season.summary, 112));
+  text("#home-now-count", nowTasks.length);
+  text("#home-next-count", nextTasks.length);
+  text("#home-buy-count", inventory.items.filter((item) => item.stockStatus === "verify").length);
+  text("#home-weather-count", profile.weatherAwareness.checks.length);
 
-  document.querySelector("#readiness-grid").innerHTML = [
-    { value: nowTasks.length, label: "active tasks" },
-    { value: nextTasks.length, label: "next decisions" },
-    { value: inventory.items.filter((item) => item.stockStatus === "verify").length, label: "stock checks" }
-  ].map((item, index) => `
-    <div class="readiness-item">
-      <span class="readiness-kicker">0${index + 1}</span>
-      <strong>${item.value}</strong>
-      <span>${escapeHtml(item.label)}</span>
-    </div>
-  `).join("");
-
-  document.querySelector("#do-now-list").innerHTML = nowTasks.map(renderPriorityTask).join("") || emptyState("No active tasks in the data model.");
-  document.querySelector("#coming-next-list").innerHTML = nextTasks.map(renderCompactTask).join("") || emptyState("No upcoming tasks listed.");
-  document.querySelector("#buy-prep-list").innerHTML = buyTasks.map(renderCompactTask).join("") || emptyState("No buy-ahead reminders listed.");
-  text("#weather-summary", profile.weatherAwareness.summary);
-  document.querySelector("#weather-grid").innerHTML = profile.weatherAwareness.checks.map((check) => `
-    <div class="weather-card">
-      <strong>${escapeHtml(check.label)}</strong>
-      <span>${escapeHtml(check.meaning)}</span>
-    </div>
+  document.querySelector("#home-now-list").innerHTML = nowTasks.slice(0, 2).map(taskRow).join("") || emptyState("No active tasks.");
+  document.querySelector("#home-next-list").innerHTML = nextTasks.slice(0, 2).map(taskRow).join("") || emptyState("No next tasks.");
+  document.querySelector("#home-buy-list").innerHTML = buyTasks.map(taskRow).join("") || emptyState("No prep reminders.");
+  document.querySelector("#home-weather-strip").innerHTML = profile.weatherAwareness.checks.slice(0, 4).map((check) => `
+    <span>${escapeHtml(check.label)}</span>
   `).join("");
 }
 
-function renderSeasonalPlan() {
+function renderPlan() {
   const { seasonal, tasks } = state.data;
-  document.querySelector("#seasonal-timeline").innerHTML = seasonal.phases.map((phase) => {
+  document.querySelectorAll("[data-plan-filter]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.planFilter === state.activePlanFilter);
+  });
+
+  const visiblePhases = seasonal.phases.filter((phase) => {
+    if (state.activePlanFilter === "all") return true;
+    if (state.activePlanFilter === "upcoming") return ["active", "next", "upcoming"].includes(phase.status);
+    return ["active", "next"].includes(phase.status);
+  });
+
+  document.querySelector("#plan-list").innerHTML = visiblePhases.map((phase) => {
     const phaseTasks = tasks.tasks.filter((task) => task.phaseId === phase.id);
     return `
-      <article class="timeline-card ${phase.status === "active" ? "active" : ""}">
-        <header>
-          <div>
-            <span class="label">${escapeHtml(phase.window)}</span>
-            <h3>${escapeHtml(phase.label)}</h3>
-          </div>
-          <span class="tag ${phase.status === "active" ? "warn" : "info"}">${escapeHtml(phase.status)}</span>
-        </header>
-        <p>${escapeHtml(phase.summary)}</p>
-        <div class="detail-grid">
-          <div class="detail">
-            <strong>Lead time</strong>
-            <span>${escapeHtml(phase.leadTime)}</span>
-          </div>
+      <details class="plan-card" ${phase.status === "active" || phase.status === "next" ? "open" : ""}>
+        <summary>
+          <span>
+            <small>${escapeHtml(phase.window)}</small>
+            <strong>${escapeHtml(phase.label)}</strong>
+          </span>
+          <em>${escapeHtml(phase.status)}</em>
+        </summary>
+        <p>${escapeHtml(concise(phase.summary, 150))}</p>
+        <div class="micro-detail"><b>Lead:</b> ${escapeHtml(phase.leadTime)}</div>
+        <div class="chip-row">
+          ${phaseTasks.slice(0, 4).map((task) => `<span>${escapeHtml(task.title)}</span>`).join("") || "<span>No linked tasks</span>"}
         </div>
-        <div class="task-strip">
-          ${phaseTasks.map((task) => `<span class="task-chip">${escapeHtml(task.title)}</span>`).join("") || `<span class="task-chip">No linked tasks yet</span>`}
-        </div>
-      </article>
+      </details>
     `;
   }).join("");
 }
 
-function renderInventory() {
+function renderProductCategories() {
+  const { inventory } = state.data;
+  document.querySelector("#product-category-strip").innerHTML = inventory.categories.map((category) => {
+    const count = categoryItems(category.id).length;
+    return `
+      <button class="${category.id === state.activeProductCategory ? "active" : ""}" type="button" data-product-category="${category.id}">
+        <span>${escapeHtml(category.label)}</span>
+        <small>${count}</small>
+      </button>
+    `;
+  }).join("");
+}
+
+function renderProducts() {
   const { inventory, purchases } = state.data;
-  text("#inventory-policy", inventory.inventoryPolicy.stockCaution);
-  document.querySelector("#inventory-grid").innerHTML = inventory.items.map((item) => `
-    <article class="item-card">
+  const category = inventory.categories.find((item) => item.id === state.activeProductCategory) || inventory.categories[0];
+  const items = categoryItems(category.id);
+
+  document.querySelector("#product-focus").innerHTML = `
+    <div class="product-category-head">
+      <span class="label">${escapeHtml(category.storeQuestion)}</span>
+      <h3>${escapeHtml(category.label)}</h3>
+      <p>${escapeHtml(category.defaultTiming)}</p>
+    </div>
+    <div class="product-list">
+      ${items.map(productCard).join("") || noProductCard(category)}
+    </div>
+  `;
+
+  document.querySelector("#purchase-history").innerHTML = purchases.purchases.map((purchase) => `
+    <div class="history-item">
+      <strong>${escapeHtml(purchase.vendor)} / ${formatDate(purchase.date)}</strong>
+      <span>${purchase.items.map((item) => `${item.quantity} x ${escapeHtml(item.name)}`).join(" / ")}</span>
+    </div>
+  `).join("");
+}
+
+function productCard(item) {
+  return `
+    <article class="product-card">
       <header>
         <div>
-          <span class="label">${escapeHtml(item.category)}</span>
-          <h3>${escapeHtml(item.name)}</h3>
+          <strong>${escapeHtml(item.name)}</strong>
+          <span>${escapeHtml(item.unitSize || item.coverage || item.category)}</span>
         </div>
-        <span class="tag ${item.stockStatus === "verify" ? "warn" : "info"}">${escapeHtml(item.stockStatus)}</span>
+        <em>${escapeHtml(item.preferredStatus || item.stockStatus)}</em>
       </header>
-      <p>${escapeHtml(item.notes)}</p>
-      <div class="detail-grid">
-        ${detail("Purchased", `${item.knownPurchasedQuantity} x ${item.unitSize}`)}
-        ${item.coverage ? detail("Coverage", item.coverage) : ""}
-        ${detail("Use timing", item.useTiming)}
-        ${detail("Reorder logic", item.reorderTiming)}
-      </div>
+      <p>${escapeHtml(item.typicalUse || item.useTiming)}</p>
+      <dl>
+        <div><dt>Last</dt><dd>${formatDate(item.lastPurchased)}</dd></div>
+        <div><dt>Timing</dt><dd>${escapeHtml(item.useTiming)}</dd></div>
+        <div><dt>Setting</dt><dd>${escapeHtml(item.spreaderSetting || "Not recorded")}</dd></div>
+      </dl>
+      <small>${escapeHtml(item.shortNote || item.notes)}</small>
     </article>
-  `).join("");
-
-  document.querySelector("#purchase-list").innerHTML = purchases.purchases.map((purchase) => `
-    <article class="purchase-card">
-      <strong>${escapeHtml(purchase.vendor)} / ${formatDate(purchase.date)}</strong>
-      <span>${purchase.items.map((item) => `${escapeHtml(item.quantity)} x ${escapeHtml(item.name)}`).join(" / ")}</span>
-    </article>
-  `).join("");
+  `;
 }
 
-function renderEquipment() {
-  const { equipment, settings } = state.data;
-  document.querySelector("#equipment-grid").innerHTML = equipment.equipment.map((item) => {
-    const linkedSettings = item.knownSettings
-      .map((id) => settings.settings.find((setting) => setting.id === id))
-      .filter(Boolean);
-    return `
-      <article class="item-card">
-        <header>
-          <div>
-            <span class="label">${escapeHtml(item.category)}</span>
-            <h3>${escapeHtml(item.name)}</h3>
-          </div>
-          <span class="tag info">${escapeHtml(item.status)}</span>
-        </header>
-        <p>${escapeHtml(item.operatingNotes)}</p>
-        <div class="detail-grid">
-          ${detail("Maintenance", item.maintenance.join(" "))}
-          ${linkedSettings.map((setting) => detail(setting.label, setting.value)).join("")}
+function noProductCard(category) {
+  return `
+    <article class="product-card empty">
+      <header>
+        <div>
+          <strong>No usual product yet</strong>
+          <span>${escapeHtml(category.label)}</span>
         </div>
-      </article>
-    `;
-  }).join("");
+      </header>
+      <p>Add a preferred or previously purchased item to inventory when this category becomes relevant.</p>
+    </article>
+  `;
 }
 
 function renderSystems() {
   const { systems, tasks } = state.data;
-  document.querySelector("#systems-grid").innerHTML = systems.systems.map((system) => {
+  document.querySelector("#systems-list").innerHTML = systems.systems.map((system) => {
     const linkedTasks = system.seasonalTasks
       .map((id) => tasks.tasks.find((task) => task.id === id))
       .filter(Boolean);
     return `
-      <article class="item-card">
+      <article class="system-card">
         <header>
           <div>
-            <span class="label">${escapeHtml(system.category)}</span>
-            <h3>${escapeHtml(system.name)}</h3>
+            <span>${escapeHtml(system.category)}</span>
+            <strong>${escapeHtml(system.name)}</strong>
           </div>
-          <span class="tag info">${escapeHtml(system.status)}</span>
+          <em>${escapeHtml(system.status)}</em>
         </header>
-        <ul class="text-list">${system.notes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul>
-        <div class="tag-row">
-          ${linkedTasks.map((task) => `<span class="tag warn">${escapeHtml(task.title)}</span>`).join("")}
+        <p>${escapeHtml(system.notes[0] || "")}</p>
+        <div class="chip-row">
+          ${linkedTasks.slice(0, 3).map((task) => `<span>${escapeHtml(task.title)}</span>`).join("")}
         </div>
       </article>
     `;
   }).join("");
 }
 
-function renderZones() {
-  document.querySelector("#zones-grid").innerHTML = state.data.zones.zones.map((zone) => `
-    <article class="item-card">
-      <header>
-        <div>
-          <span class="label">${escapeHtml(zone.category)}</span>
-          <h3>${escapeHtml(zone.name)}</h3>
-        </div>
-        <span class="tag info">${escapeHtml(zone.condition)}</span>
-      </header>
-      <p>${escapeHtml(zone.strategy)}</p>
-      <ul class="text-list">
-        ${zone.recommendations.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
-      </ul>
-    </article>
-  `).join("");
+function renderMore() {
+  const { equipment, zones, settings, profile } = state.data;
+  document.querySelector("#more-equipment").innerHTML = equipment.equipment.map((item) => denseItem(item.name, item.status, item.operatingNotes)).join("");
+  document.querySelector("#more-zones").innerHTML = zones.zones.map((zone) => denseItem(zone.name, zone.condition, zone.strategy)).join("");
+  document.querySelector("#more-settings").innerHTML = settings.settings.map((setting) => denseItem(setting.label, setting.confidence, setting.value)).join("");
+  document.querySelector("#more-lessons").innerHTML = [...settings.lessonsLearned, ...profile.lawn.defaultRules]
+    .map((lesson) => `<li>${escapeHtml(lesson)}</li>`)
+    .join("");
+  document.querySelector("#more-sources").innerHTML = settings.sources
+    .map((source) => `<a class="dense-item" href="${escapeHtml(source.url)}" rel="noreferrer"><strong>${escapeHtml(source.label)}</strong><span>Open source</span></a>`)
+    .join("");
 }
 
-function renderReference() {
-  const { settings, profile } = state.data;
-  document.querySelector("#settings-grid").innerHTML = settings.settings.map((setting) => `
-    <article class="item-card">
-      <header>
-        <div>
-          <span class="label">${escapeHtml(setting.category)}</span>
-          <h3>${escapeHtml(setting.label)}</h3>
-        </div>
-        <span class="tag ${setting.confidence.includes("needs") ? "warn" : "ok"}">${escapeHtml(setting.confidence)}</span>
-      </header>
-      <p>${escapeHtml(setting.value)}</p>
-      <div class="detail-grid">${detail("Notes", setting.notes)}</div>
-    </article>
-  `).join("");
-
-  document.querySelector("#lessons-list").innerHTML = [
-    ...settings.lessonsLearned,
-    ...profile.lawn.defaultRules
-  ].map((lesson) => `<li>${escapeHtml(lesson)}</li>`).join("");
-
-  document.querySelector("#source-list").innerHTML = settings.sources.map((source) => `
-    <a class="source-link" href="${escapeHtml(source.url)}" rel="noreferrer">${escapeHtml(source.label)}</a>
-  `).join("");
+function categoryItems(categoryId) {
+  return state.data.inventory.items.filter((item) => {
+    return item.primaryCategory === categoryId || (item.secondaryCategories || []).includes(categoryId);
+  });
 }
 
-function renderPriorityTask(task) {
+function buyPrepTasks() {
+  return state.data.tasks.tasks.filter((task) => task.status === "buy-soon" || task.category === "prep / buying");
+}
+
+function taskRow(task) {
   return `
-    <article class="priority-card priority-${escapeHtml(task.priority)}">
-      <header>
-        <div>
-          <span class="label">${escapeHtml(task.category)}</span>
-          <h4>${escapeHtml(task.title)}</h4>
-        </div>
-        <span class="tag ${task.priority === "high" ? "warn" : "info"}">${escapeHtml(task.priority)}</span>
-      </header>
-      <p>${escapeHtml(task.notes)}</p>
-      <div class="detail-grid">
-        ${detail("Timing", task.timing)}
-        ${detail("Weather", task.weatherRules.join(" ") || "No weather rule recorded.")}
-        ${detail("Lead time", task.leadTime)}
-      </div>
-    </article>
-  `;
-}
-
-function renderCompactTask(task) {
-  return `
-    <div class="compact-row">
+    <div class="task-row">
       <strong>${escapeHtml(task.title)}</strong>
-      <span>${escapeHtml(task.timing)} / ${escapeHtml(task.leadTime)}</span>
+      <span>${escapeHtml(task.timing)}</span>
     </div>
   `;
 }
 
-function detail(label, value) {
-  if (!value) return "";
+function denseItem(title, meta, body) {
   return `
-    <div class="detail">
-      <strong>${escapeHtml(label)}</strong>
-      <span>${escapeHtml(value)}</span>
+    <div class="dense-item">
+      <strong>${escapeHtml(title)}</strong>
+      <span>${escapeHtml(meta)}</span>
+      <p>${escapeHtml(concise(body || "", 120))}</p>
     </div>
   `;
 }
@@ -342,6 +332,12 @@ function renderLoadError(error) {
 function text(selector, value) {
   const element = document.querySelector(selector);
   if (element) element.textContent = value || "";
+}
+
+function concise(value, limit) {
+  const textValue = String(value || "");
+  if (textValue.length <= limit) return textValue;
+  return `${textValue.slice(0, limit - 1).trim()}...`;
 }
 
 function formatDate(value) {
@@ -368,9 +364,7 @@ function icon(name) {
     home: `<svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H5V10.5Z"></path><path d="M10 20v-6h4v6"></path></svg>`,
     timeline: `<svg viewBox="0 0 24 24"><path d="M6 5v14"></path><path d="M6 7h11l-2 3 2 3H6"></path><path d="M6 17h9"></path></svg>`,
     box: `<svg viewBox="0 0 24 24"><path d="m4 8 8-4 8 4-8 4-8-4Z"></path><path d="M4 8v8l8 4 8-4V8"></path><path d="M12 12v8"></path></svg>`,
-    tool: `<svg viewBox="0 0 24 24"><path d="M14 6a4 4 0 0 0 5 5L10 20l-4-4 9-9Z"></path><path d="m7 17-3 3"></path></svg>`,
     system: `<svg viewBox="0 0 24 24"><path d="M12 3v5"></path><path d="M5 12h14"></path><path d="M7 12v7h10v-7"></path><path d="M9 8h6"></path></svg>`,
-    map: `<svg viewBox="0 0 24 24"><path d="M4 5c5-2 11 2 16 0v14c-5 2-11-2-16 0V5Z"></path><path d="M8 4v14M16 6v14"></path></svg>`,
     book: `<svg viewBox="0 0 24 24"><path d="M5 4h10a4 4 0 0 1 4 4v12H8a3 3 0 0 0-3 3V4Z"></path><path d="M5 18h12"></path></svg>`
   };
   return icons[name] || icons.home;

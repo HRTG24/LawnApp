@@ -1,8 +1,16 @@
 # Outdoor Ops Property Field Manual
 
-This is a mobile-first, GitHub Pages friendly outdoor operations reference app for the Wichita-area property context.
+This is a compact, mobile-first, GitHub Pages friendly outdoor operations utility app for the Wichita-area property context.
 
 The goal is not browser-side data entry. The site is a read-first source of truth that Codex updates after ChatGPT conversations summarize changed decisions, purchases, equipment notes, weather considerations, or seasonal plans.
+
+The app is organized around five fast lookup sections:
+
+- `Home` - compact command center for current phase, now/next/buy/weather.
+- `Plan` - compact seasonal windows with lead-time planning.
+- `Products` - category-first product recall for store trips and buying decisions.
+- `Systems` - irrigation, backflow, mulch cycle, and recurring system tasks.
+- `More` - equipment, zones, known settings, lessons, and sources.
 
 The operating goal is a healthy, low-effort tall fescue lawn and outdoor system with practical timing, good inventory awareness, and sane decisions.
 

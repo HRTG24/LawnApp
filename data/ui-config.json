@@ -1,12 +1,10 @@
 {
   "navigation": [
     { "id": "home", "label": "Home", "shortLabel": "Home", "icon": "home" },
-    { "id": "seasonal", "label": "Seasonal Plan", "shortLabel": "Plan", "icon": "timeline" },
-    { "id": "inventory", "label": "Inventory", "shortLabel": "Stock", "icon": "box" },
-    { "id": "equipment", "label": "Equipment", "shortLabel": "Gear", "icon": "tool" },
+    { "id": "plan", "label": "Plan", "shortLabel": "Plan", "icon": "timeline" },
+    { "id": "products", "label": "Products", "shortLabel": "Products", "icon": "box" },
     { "id": "systems", "label": "Systems", "shortLabel": "Systems", "icon": "system" },
-    { "id": "zones", "label": "Zones", "shortLabel": "Zones", "icon": "map" },
-    { "id": "reference", "label": "Reference", "shortLabel": "Ref", "icon": "book" }
+    { "id": "more", "label": "More", "shortLabel": "More", "icon": "book" }
   ],
   "homeCards": [
     {

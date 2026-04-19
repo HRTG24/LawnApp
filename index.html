@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#101512">
+    <meta name="theme-color" content="#0d120f">
     <title>Outdoor Ops</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23101512'/%3E%3Cpath d='M5 17h14M7 17c1-5 3-8 5-11 2 3 4 6 5 11' fill='none' stroke='%23c6a15b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230d120f'/%3E%3Cpath d='M5 17h14M7 17c1-5 3-8 5-11 2 3 4 6 5 11' fill='none' stroke='%23c49a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -23,7 +23,7 @@
           </span>
           <span>
             <strong id="rail-app-name">Outdoor Ops</strong>
-            <small id="rail-app-subtitle">Property field manual</small>
+            <small id="rail-app-subtitle">Field manual</small>
           </span>
         </div>
         <nav class="rail-nav" id="desktop-nav"></nav>
@@ -35,145 +35,142 @@
             <p class="eyebrow" id="top-context">Wichita area</p>
             <h1 id="view-title">Home</h1>
           </div>
-          <div class="status-pill" id="phase-pill">Loading</div>
+          <div class="phase-chip" id="phase-pill">Loading</div>
         </header>
 
         <main id="main" class="views" tabindex="-1">
           <section class="view active" id="home-view" data-view="home" aria-labelledby="home-heading">
-            <div class="view-head">
+            <div class="compact-head">
               <p class="eyebrow" id="home-window"></p>
-              <h2 id="home-heading">Field Manual</h2>
-              <p class="lead" id="home-summary"></p>
+              <h2 id="home-heading">Command Center</h2>
             </div>
 
-            <section class="hero-panel" aria-label="Current operational snapshot">
+            <section class="status-card" aria-label="Current phase">
               <div>
-                <span class="label">Current Phase</span>
+                <span class="label">Phase</span>
                 <h3 id="current-phase-title"></h3>
-                <p id="current-phase-copy"></p>
               </div>
-              <div class="readiness-grid" id="readiness-grid"></div>
+              <p id="current-phase-copy"></p>
             </section>
 
-            <section class="section-block" aria-labelledby="now-heading">
-              <div class="section-title-row">
-                <h3 id="now-heading">Do Now</h3>
-                <span>Active window</span>
+            <section class="command-grid" aria-label="Operational summary">
+              <button class="command-tile" type="button" data-nav-target="plan">
+                <span>Now</span>
+                <strong id="home-now-count">0</strong>
+                <small id="home-now-label">Active tasks</small>
+              </button>
+              <button class="command-tile" type="button" data-nav-target="plan">
+                <span>Next</span>
+                <strong id="home-next-count">0</strong>
+                <small id="home-next-label">Coming up</small>
+              </button>
+              <button class="command-tile" type="button" data-nav-target="products">
+                <span>Buy</span>
+                <strong id="home-buy-count">0</strong>
+                <small id="home-buy-label">Prep checks</small>
+              </button>
+              <button class="command-tile" type="button" data-nav-target="systems">
+                <span>Weather</span>
+                <strong id="home-weather-count">0</strong>
+                <small>Watch items</small>
+              </button>
+            </section>
+
+            <section class="mini-panel">
+              <div class="panel-head">
+                <h3>Do Now</h3>
+                <button class="plain-link" type="button" data-nav-target="plan">Plan</button>
               </div>
-              <div class="priority-stack" id="do-now-list"></div>
+              <div class="short-list" id="home-now-list"></div>
             </section>
 
-            <section class="home-grid">
-              <article class="card">
-                <div class="section-title-row">
-                  <h3>Coming Next</h3>
-                  <span>Plan ahead</span>
+            <section class="mini-grid">
+              <article class="mini-panel">
+                <div class="panel-head">
+                  <h3>Next</h3>
+                  <button class="plain-link" type="button" data-nav-target="plan">Open</button>
                 </div>
-                <div class="compact-list" id="coming-next-list"></div>
+                <div class="short-list" id="home-next-list"></div>
               </article>
-
-              <article class="card">
-                <div class="section-title-row">
-                  <h3>Buy / Prep Soon</h3>
-                  <span>Lead time</span>
+              <article class="mini-panel">
+                <div class="panel-head">
+                  <h3>Buy / Prep</h3>
+                  <button class="plain-link" type="button" data-nav-target="products">Products</button>
                 </div>
-                <div class="compact-list" id="buy-prep-list"></div>
+                <div class="short-list" id="home-buy-list"></div>
               </article>
             </section>
 
-            <section class="weather-panel" aria-labelledby="weather-heading">
-              <div class="section-title-row">
-                <h3 id="weather-heading">Weather-Aware Checks</h3>
+            <section class="mini-panel">
+              <div class="panel-head">
+                <h3>Weather Watch</h3>
                 <span>Placeholder</span>
               </div>
-              <p id="weather-summary"></p>
-              <div class="weather-grid" id="weather-grid"></div>
+              <div class="weather-strip" id="home-weather-strip"></div>
             </section>
           </section>
 
-          <section class="view" id="seasonal-view" data-view="seasonal" aria-labelledby="seasonal-heading">
-            <div class="view-head">
-              <p class="eyebrow">Phase-based planning</p>
-              <h2 id="seasonal-heading">Seasonal Plan</h2>
-              <p class="lead">A timeline that surfaces prep work before the application or work window arrives.</p>
+          <section class="view" id="plan-view" data-view="plan" aria-labelledby="plan-heading">
+            <div class="compact-head">
+              <p class="eyebrow">Seasonal windows</p>
+              <h2 id="plan-heading">Plan</h2>
             </div>
-            <div class="timeline" id="seasonal-timeline"></div>
+            <div class="segmented" id="plan-filters" aria-label="Plan filter">
+              <button class="active" type="button" data-plan-filter="focus">Focus</button>
+              <button type="button" data-plan-filter="upcoming">Upcoming</button>
+              <button type="button" data-plan-filter="all">All</button>
+            </div>
+            <div class="plan-list" id="plan-list"></div>
           </section>
 
-          <section class="view" id="inventory-view" data-view="inventory" aria-labelledby="inventory-heading">
-            <div class="view-head">
-              <p class="eyebrow">Products and purchase memory</p>
-              <h2 id="inventory-heading">Inventory</h2>
-              <p class="lead" id="inventory-policy"></p>
+          <section class="view" id="products-view" data-view="products" aria-labelledby="products-heading">
+            <div class="compact-head">
+              <p class="eyebrow">Store recall</p>
+              <h2 id="products-heading">Products</h2>
             </div>
-            <div class="card-grid" id="inventory-grid"></div>
-            <section class="section-block" aria-labelledby="history-heading">
-              <div class="section-title-row">
-                <h3 id="history-heading">Purchase History</h3>
-                <span>No private details</span>
-              </div>
-              <div class="purchase-list" id="purchase-list"></div>
-            </section>
-          </section>
-
-          <section class="view" id="equipment-view" data-view="equipment" aria-labelledby="equipment-heading">
-            <div class="view-head">
-              <p class="eyebrow">Tools, defaults, settings</p>
-              <h2 id="equipment-heading">Equipment</h2>
-              <p class="lead">Operational notes for the gear that affects outdoor decisions.</p>
-            </div>
-            <div class="card-grid" id="equipment-grid"></div>
+            <div class="category-strip" id="product-category-strip" aria-label="Product categories"></div>
+            <section class="product-focus" id="product-focus" aria-live="polite"></section>
+            <details class="drawer">
+              <summary>Purchase history</summary>
+              <div class="history-list" id="purchase-history"></div>
+            </details>
           </section>
 
           <section class="view" id="systems-view" data-view="systems" aria-labelledby="systems-heading">
-            <div class="view-head">
-              <p class="eyebrow">Property systems</p>
+            <div class="compact-head">
+              <p class="eyebrow">Operational reference</p>
               <h2 id="systems-heading">Systems</h2>
-              <p class="lead">Irrigation, backflow, mulch beds, and seasonal system tasks.</p>
             </div>
-            <div class="card-grid" id="systems-grid"></div>
+            <div class="system-list" id="systems-list"></div>
           </section>
 
-          <section class="view" id="zones-view" data-view="zones" aria-labelledby="zones-heading">
-            <div class="view-head">
-              <p class="eyebrow">Area-specific strategy</p>
-              <h2 id="zones-heading">Zones</h2>
-              <p class="lead">Different yard areas can have different constraints, priorities, and recommendations.</p>
-            </div>
-            <div class="card-grid" id="zones-grid"></div>
-          </section>
-
-          <section class="view" id="reference-view" data-view="reference" aria-labelledby="reference-heading">
-            <div class="view-head">
+          <section class="view" id="more-view" data-view="more" aria-labelledby="more-heading">
+            <div class="compact-head">
               <p class="eyebrow">Secondary reference</p>
-              <h2 id="reference-heading">Reference</h2>
-              <p class="lead">Known settings, lessons learned, and source material that support the operating plan.</p>
+              <h2 id="more-heading">More</h2>
             </div>
-
-            <section class="section-block" aria-labelledby="settings-heading">
-              <div class="section-title-row">
-                <h3 id="settings-heading">Known Settings</h3>
-                <span>Update as learned</span>
-              </div>
-              <div class="card-grid" id="settings-grid"></div>
-            </section>
-
-            <section class="home-grid">
-              <article class="card">
-                <div class="section-title-row">
-                  <h3>Lessons Learned</h3>
-                  <span>Principles</span>
-                </div>
-                <ul class="text-list" id="lessons-list"></ul>
-              </article>
-              <article class="card">
-                <div class="section-title-row">
-                  <h3>Sources</h3>
-                  <span>Support</span>
-                </div>
-                <div class="source-list" id="source-list"></div>
-              </article>
-            </section>
+            <div class="drawer-list">
+              <details class="drawer" open>
+                <summary>Equipment</summary>
+                <div class="dense-list" id="more-equipment"></div>
+              </details>
+              <details class="drawer">
+                <summary>Zones</summary>
+                <div class="dense-list" id="more-zones"></div>
+              </details>
+              <details class="drawer">
+                <summary>Known settings</summary>
+                <div class="dense-list" id="more-settings"></div>
+              </details>
+              <details class="drawer">
+                <summary>Lessons learned</summary>
+                <ul class="lesson-list" id="more-lessons"></ul>
+              </details>
+              <details class="drawer">
+                <summary>Sources</summary>
+                <div class="dense-list" id="more-sources"></div>
+              </details>
+            </div>
           </section>
         </main>
       </div>
