@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wichita Tall Fescue Lawn Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav-shell" aria-label="Primary navigation">
+        <a class="brand" href="#dashboard" aria-label="Wichita Tall Fescue Lawn Dashboard home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>
+            <strong>Lawn Dashboard</strong>
+            <small>Wichita tall fescue</small>
+          </span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <span class="sr-only">Toggle navigation</span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <div class="nav-links" id="site-nav">
+          <a href="#weekly-plan">Weekly Plan</a>
+          <a href="#annual-calendar">Annual Calendar</a>
+          <a href="#journal">Journal</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="dashboard">
+      <section class="hero section-band">
+        <div class="hero-copy">
+          <p class="eyebrow">Low-effort homeowner system</p>
+          <h1>Keep the lawn healthy with a short plan, a seasonal rhythm, and a usable record.</h1>
+          <p>
+            Built from the Lawn-System notes for a Wichita, Kansas area tall fescue lawn.
+            The goal is steady, practical care instead of chasing a perfect lawn.
+          </p>
+          <div class="hero-actions" aria-label="Dashboard shortcuts">
+            <a class="button primary" href="#weekly-plan">View this week</a>
+            <a class="button secondary" href="#journal">Add a journal note</a>
+          </div>
+        </div>
+        <div class="status-panel" aria-label="Current lawn focus">
+          <div class="season-meter" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <dl>
+            <div>
+              <dt>Location</dt>
+              <dd>Wichita, Kansas area</dd>
+            </div>
+            <div>
+              <dt>Grass</dt>
+              <dd>Tall fescue</dd>
+            </div>
+            <div>
+              <dt>Priority</dt>
+              <dd>Mow tall, avoid scalping, watch spring timing</dd>
+            </div>
+            <div>
+              <dt>Best windows</dt>
+              <dd>Spring crabgrass prevention, fall seeding and fertilizer</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="overview section-pad" aria-labelledby="overview-title">
+        <div class="section-heading">
+          <p class="eyebrow">Dashboard</p>
+          <h2 id="overview-title">Quick Read</h2>
+        </div>
+        <div class="overview-grid">
+          <article class="summary-card">
+            <span class="card-icon" aria-hidden="true">1</span>
+            <h3>Do less, but time it well</h3>
+            <p>Most weeks only need mowing, weather checks, and one or two decisions.</p>
+          </article>
+          <article class="summary-card">
+            <span class="card-icon" aria-hidden="true">2</span>
+            <h3>Protect the cool-season grass</h3>
+            <p>Raise mowing height and avoid forcing lush growth through Kansas heat.</p>
+          </article>
+          <article class="summary-card">
+            <span class="card-icon" aria-hidden="true">3</span>
+            <h3>Make fall count</h3>
+            <p>September and November are the biggest windows for feeding, seeding, and recovery.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-pad" id="weekly-plan" aria-labelledby="weekly-title">
+        <div class="section-heading split">
+          <div>
+            <p class="eyebrow">Current Weekly Plan</p>
+            <h2 id="weekly-title">April 19-24, 2026</h2>
+          </div>
+          <p class="section-note">Near Wichita, Kansas. Adjust for actual weather, soil moisture, and product labels.</p>
+        </div>
+
+        <div class="weekly-layout">
+          <article class="plan-column">
+            <h3>Top Actions</h3>
+            <ol class="action-list">
+              <li>
+                <strong>Mow if the lawn is actively growing and tall enough.</strong>
+                <span>Keep tall fescue on the taller side, remove no more than one-third of the blade, and favor Sunday through Tuesday before wind and storms.</span>
+              </li>
+              <li>
+                <strong>Check whether crabgrass pre-emergent has already been applied.</strong>
+                <span>Use the Kansas spring window if crabgrass has been a real issue. Apply on a calm day and water it in according to the label.</span>
+              </li>
+              <li>
+                <strong>Spot check weeds and thin areas.</strong>
+                <span>Spot treat broadleaf weeds only when needed and label conditions are right. Mark thin or bare areas for fall seeding.</span>
+              </li>
+            </ol>
+          </article>
+
+          <aside class="plan-column accent">
+            <h3>Skip This Week</h3>
+            <ul class="check-list">
+              <li>Heavy nitrogen fertilizer unless there is a specific reason and summer watering is realistic.</li>
+              <li>Large seeding projects unless there is no alternative; fall is easier for tall fescue.</li>
+              <li>Grub treatment without known history or confirmed signs.</li>
+            </ul>
+          </aside>
+
+          <article class="plan-column">
+            <h3>Monitor</h3>
+            <ul class="check-list">
+              <li>Redbud bloom and crabgrass timing.</li>
+              <li>Soil moisture after Thursday storms.</li>
+              <li>Brown patches after warm, humid weather.</li>
+              <li>Areas that dry out first.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-band calendar-section" id="annual-calendar" aria-labelledby="calendar-title">
+        <div class="section-heading split">
+          <div>
+            <p class="eyebrow">Annual Lawn Calendar</p>
+            <h2 id="calendar-title">Tall Fescue Rhythm</h2>
+          </div>
+          <div class="calendar-controls" role="group" aria-label="Calendar filter">
+            <button class="filter-button active" type="button" data-filter="all">All</button>
+            <button class="filter-button" type="button" data-filter="spring">Spring</button>
+            <button class="filter-button" type="button" data-filter="summer">Summer</button>
+            <button class="filter-button" type="button" data-filter="fall">Fall</button>
+            <button class="filter-button" type="button" data-filter="winter">Winter</button>
+          </div>
+        </div>
+
+        <div class="calendar-grid" id="calendar-grid">
+          <article class="month-card" data-season="winter" data-months="0,1">
+            <h3>January-February</h3>
+            <p><strong>Do:</strong> Leave the lawn alone unless debris needs removal. Service the mower and sharpen the blade.</p>
+            <p><strong>Buy:</strong> Mower blade service or soil test materials if needed.</p>
+            <p><strong>Monitor:</strong> Heavy foot traffic on frozen or muddy turf.</p>
+            <p><strong>Ignore:</strong> Winter color.</p>
+          </article>
+
+          <article class="month-card" data-season="spring" data-months="2">
+            <h3>March</h3>
+            <p><strong>Do:</strong> Start mowing when growth begins. Spot treat broadleaf weeds only on a label-approved day.</p>
+            <p><strong>Buy:</strong> Broadleaf spot-treatment product only if weeds are noticeable.</p>
+            <p><strong>Monitor:</strong> Redbud trees and soil warming as crabgrass prevention cues.</p>
+            <p><strong>Ignore:</strong> Heavy early spring fertilizer.</p>
+          </article>
+
+          <article class="month-card" data-season="spring" data-months="3">
+            <h3>April</h3>
+            <p><strong>Do:</strong> Apply crabgrass pre-emergent around redbud full bloom if crabgrass has been a problem.</p>
+            <p><strong>Buy:</strong> Crabgrass pre-emergent if needed.</p>
+            <p><strong>Monitor:</strong> Washout rain after applications and thin areas for fall overseeding.</p>
+            <p><strong>Ignore:</strong> Perfection.</p>
+          </article>
+
+          <article class="month-card" data-season="spring" data-months="4">
+            <h3>May</h3>
+            <p><strong>Do:</strong> Fertilize lightly only if you plan to irrigate through summer or rainfall keeps growth active.</p>
+            <p><strong>Buy:</strong> Slow-release fertilizer or grub prevention only when there is a known reason.</p>
+            <p><strong>Monitor:</strong> Heat, dry spots, mower height, and early disease pressure.</p>
+            <p><strong>Ignore:</strong> Blanket pest treatments.</p>
+          </article>
+
+          <article class="month-card" data-season="summer" data-months="5,6">
+            <h3>June-Mid July</h3>
+            <p><strong>Do:</strong> Raise the mower to the higher end of the tall fescue range and water only as needed.</p>
+            <p><strong>Buy:</strong> Nothing unless there is a specific problem.</p>
+            <p><strong>Monitor:</strong> Wilting, footprints that do not rebound, gray-blue color, drought stress, and brown patch.</p>
+            <p><strong>Ignore:</strong> Forcing cool-season grass to look lush in Kansas heat.</p>
+          </article>
+
+          <article class="month-card" data-season="summer" data-months="6,7">
+            <h3>Late July-August</h3>
+            <p><strong>Do:</strong> Keep mowing high, protect the crown, and plan fall seed, aeration, soil testing, and fertilizer.</p>
+            <p><strong>Buy:</strong> Turf-type tall fescue seed and starter fertilizer only if the plan calls for it.</p>
+            <p><strong>Monitor:</strong> Grub damage, heat stress, disease, and bare or thin areas.</p>
+            <p><strong>Ignore:</strong> Major renovation during peak heat.</p>
+          </article>
+
+          <article class="month-card" data-season="fall" data-months="8">
+            <h3>September</h3>
+            <p><strong>Do:</strong> Fertilize around Labor Day. Aerate if compacted. Overseed or seed thin areas.</p>
+            <p><strong>Buy:</strong> Quality tall fescue seed, fall fertilizer, and compost only if it solves a real issue.</p>
+            <p><strong>Monitor:</strong> Germination, watering consistency, washouts, and weeds in new seed.</p>
+            <p><strong>Ignore:</strong> Most weed killers on brand-new grass unless the label allows it.</p>
+          </article>
+
+          <article class="month-card" data-season="fall" data-months="9">
+            <h3>October</h3>
+            <p><strong>Do:</strong> Continue care for new seed. Mow when new grass is ready. Spot treat weeds only if safe for new turf.</p>
+            <p><strong>Buy:</strong> Nothing unless September supplies ran short.</p>
+            <p><strong>Monitor:</strong> Young grass drying out, leaves smothering turf, and broadleaf weeds.</p>
+            <p><strong>Ignore:</strong> Late seeding too close to hard freezes.</p>
+          </article>
+
+          <article class="month-card" data-season="fall" data-months="10">
+            <h3>November</h3>
+            <p><strong>Do:</strong> Apply high-nitrogen fall fertilizer, water it in if needed, and keep leaves from matting.</p>
+            <p><strong>Buy:</strong> Winterizing or high-nitrogen fertilizer.</p>
+            <p><strong>Monitor:</strong> Leaf cover and dry soil before winter.</p>
+            <p><strong>Ignore:</strong> Cosmetic color once cold weather sets in.</p>
+          </article>
+
+          <article class="month-card" data-season="winter" data-months="11">
+            <h3>December</h3>
+            <p><strong>Do:</strong> Clean and store equipment. Review the journal for what worked.</p>
+            <p><strong>Buy:</strong> Nothing unless replacing worn tools.</p>
+            <p><strong>Monitor:</strong> Traffic or debris damaging turf.</p>
+            <p><strong>Ignore:</strong> Lawn anxiety. The year is basically done.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-pad" id="journal" aria-labelledby="journal-title">
+        <div class="section-heading split">
+          <div>
+            <p class="eyebrow">Lawn Journal</p>
+            <h2 id="journal-title">Keep It Messy And Useful</h2>
+          </div>
+          <p class="section-note">One short entry beats a perfect record that never gets updated.</p>
+        </div>
+
+        <div class="journal-layout">
+          <form class="journal-form" id="journal-form">
+            <label>
+              Date
+              <input type="date" id="entry-date" name="date" required>
+            </label>
+            <label>
+              Weather
+              <input type="text" id="entry-weather" name="weather" placeholder="Warm, dry, windy, rain overnight">
+            </label>
+            <label>
+              Mowed
+              <input type="text" id="entry-mowed" name="mowed" placeholder="No, or yes at high setting">
+            </label>
+            <label>
+              Water or rain
+              <input type="text" id="entry-water" name="water" placeholder="0.5 inch rain, watered front yard">
+            </label>
+            <label>
+              Products or work
+              <input type="text" id="entry-products" name="products" placeholder="Pre-emergent, fertilizer, seed, aeration">
+            </label>
+            <label>
+              Problems noticed
+              <textarea id="entry-problems" name="problems" rows="3" placeholder="Thin spots, weeds, brown patches, dry areas"></textarea>
+            </label>
+            <label>
+              What I did
+              <textarea id="entry-did" name="did" rows="3" placeholder="Short and plain is perfect"></textarea>
+            </label>
+            <label>
+              Next thing to ask or check
+              <textarea id="entry-next" name="next" rows="3" placeholder="Has pre-emergent been applied? Any thin areas to mark for fall?"></textarea>
+            </label>
+            <div class="form-actions">
+              <button class="button primary" type="submit">Save Entry</button>
+              <button class="button ghost" type="button" id="clear-form">Clear</button>
+            </div>
+          </form>
+
+          <div class="journal-side">
+            <article class="profile-box">
+              <h3>Lawn Profile</h3>
+              <dl>
+                <div>
+                  <dt>Location</dt>
+                  <dd>Wichita, Kansas area</dd>
+                </div>
+                <div>
+                  <dt>Grass</dt>
+                  <dd>Tall fescue</dd>
+                </div>
+                <div>
+                  <dt>Goal</dt>
+                  <dd>Healthy, low-effort homeowner lawn</dd>
+                </div>
+                <div>
+                  <dt>Current priorities</dt>
+                  <dd>Mow appropriately, avoid unnecessary fertilizer, watch weather, prioritize fall work.</dd>
+                </div>
+              </dl>
+            </article>
+
+            <article class="entries-box">
+              <div class="entries-head">
+                <h3>Saved Entries</h3>
+                <button class="text-button" type="button" id="clear-entries">Clear saved</button>
+              </div>
+              <div class="entry-list" id="entry-list" aria-live="polite"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Source material adapted from the local Lawn-System notes. Follow product labels and adjust timing for actual conditions.</p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
