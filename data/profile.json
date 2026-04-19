@@ -45,6 +45,29 @@
   "weatherAwareness": {
     "status": "placeholder",
     "summary": "Live weather is not integrated yet. Use this area as the future hook for weather-aware recommendations.",
+    "forecast": [
+      {
+        "day": "Today",
+        "condition": "Partly cloudy",
+        "icon": "partly-cloudy",
+        "high": 68,
+        "low": 48
+      },
+      {
+        "day": "Mon",
+        "condition": "Rain possible",
+        "icon": "rain",
+        "high": 64,
+        "low": 46
+      },
+      {
+        "day": "Tue",
+        "condition": "Clear",
+        "icon": "sun",
+        "high": 71,
+        "low": 50
+      }
+    ],
     "checks": [
       {
         "id": "freeze-risk",

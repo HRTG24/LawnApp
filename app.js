@@ -49,7 +49,6 @@ function renderApp() {
   document.title = profile.app.name;
   text("#rail-app-name", profile.app.name);
   text("#rail-app-subtitle", profile.app.subtitle);
-  text("#top-context", `${profile.property.region} / ${profile.lawn.grassType}`);
 
   renderNavigation();
   renderHome();
@@ -121,11 +120,21 @@ function renderHome() {
   const { profile, inventory, systems } = state.data;
   const season = profile.currentSeason;
   text("#home-window", `${season.window} / ${formatDate(season.asOf)}`);
-  text("#home-subtitle", profile.property.operatingGoal);
   text("#launcher-plan-note", season.label);
   text("#launcher-gear-note", `${inventory.categories.length} categories`);
   text("#launcher-property-note", `${systems.systems.length} systems`);
-  text("#season-note", `${season.label}: ${concise(season.summary, 105)}`);
+  renderWeatherPanel();
+}
+
+function renderWeatherPanel() {
+  const forecast = state.data.profile.weatherAwareness.forecast || [];
+  document.querySelector("#weather-grid").innerHTML = forecast.slice(0, 3).map((day) => `
+    <article class="weather-day" title="${escapeHtml(day.condition || "")}">
+      <span>${escapeHtml(day.day)}</span>
+      <i aria-hidden="true">${icon(day.icon || "cloud")}</i>
+      <strong>${formatTemperature(day.high)} / ${formatTemperature(day.low)}</strong>
+    </article>
+  `).join("");
 }
 
 function renderPlan() {
@@ -136,7 +145,7 @@ function renderPlan() {
   const buyTasks = tasks.tasks.filter((task) => task.status === "buy-soon" || task.category === "prep / buying");
   const activePhase = seasonal.phases.find((phase) => phase.id === season.phaseId);
 
-  text("#plan-phase-window", season.window);
+  text("#plan-phase-window", "Current phase");
   text("#plan-phase-title", season.label);
   text("#plan-main-recommendation", nowTasks[0]?.notes || season.summary);
 
@@ -353,6 +362,11 @@ function formatDate(value) {
   return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(date);
 }
 
+function formatTemperature(value) {
+  if (value === null || value === undefined || value === "") return "--";
+  return `${Math.round(Number(value))}°`;
+}
+
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -364,10 +378,14 @@ function escapeHtml(value) {
 
 function icon(name) {
   const icons = {
-    mark: `<svg viewBox="0 0 24 24"><path d="M4.5 17.5h15"></path><path d="M7 17.5c1.2-5.2 3-8.9 5-12.5 2 3.6 3.8 7.3 5 12.5"></path><path d="M9.2 13.2h5.6"></path></svg>`,
+    mark: `<svg viewBox="0 0 24 24"><path d="M4.5 18.5h15"></path><path d="M7 18.5c.3-3.4 1.4-5.8 3.3-7.5"></path><path d="M11.2 18.5c-.1-4.5.5-8.5 1.8-12.3"></path><path d="M15 18.5c.2-3.8 1-6.5 2.4-8.5"></path><path d="M9.3 18.5c-.5-2.5-1.4-4.3-2.7-5.5"></path><path d="M17.2 18.5c-.2-2.5-.8-4.3-1.9-5.6"></path></svg>`,
     plan: `<svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"></path><path d="M8 9h8M8 13h5"></path><path d="M16 16l3 3"></path></svg>`,
     gear: `<svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"></path><path d="M12 3v3M12 18v3M4.2 7.5l2.6 1.5M17.2 15l2.6 1.5M4.2 16.5 6.8 15M17.2 9l2.6-1.5"></path></svg>`,
-    property: `<svg viewBox="0 0 24 24"><path d="M4 6c5-2 11 2 16 0v12c-5 2-11-2-16 0V6Z"></path><path d="M8 5v12M16 7v12"></path></svg>`
+    property: `<svg viewBox="0 0 24 24"><path d="M4 6c5-2 11 2 16 0v12c-5 2-11-2-16 0V6Z"></path><path d="M8 5v12M16 7v12"></path></svg>`,
+    sun: `<svg viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"></path><path d="M12 3.8v2M12 18.2v2M4.8 12h2M17.2 12h2M6.9 6.9l1.4 1.4M15.7 15.7l1.4 1.4M17.1 6.9l-1.4 1.4M8.3 15.7l-1.4 1.4"></path></svg>`,
+    cloud: `<svg viewBox="0 0 24 24"><path d="M7.2 17.5h9.6a3.2 3.2 0 0 0 .5-6.4 5.1 5.1 0 0 0-9.8 1.2h-.3a2.6 2.6 0 0 0 0 5.2Z"></path></svg>`,
+    "partly-cloudy": `<svg viewBox="0 0 24 24"><path d="M8.2 8.2a3.4 3.4 0 0 1 5.9 2.4"></path><path d="M6.2 5.7 5 4.5M12 3v1.8M3 10.7h1.8"></path><path d="M7.3 18h9.2a3 3 0 0 0 .5-5.9 4.8 4.8 0 0 0-9.2 1.1h-.5a2.4 2.4 0 0 0 0 4.8Z"></path></svg>`,
+    rain: `<svg viewBox="0 0 24 24"><path d="M7.2 14.7h9.6a3 3 0 0 0 .5-6 5.1 5.1 0 0 0-9.8 1.2h-.3a2.4 2.4 0 0 0 0 4.8Z"></path><path d="M8.5 18.1 7.8 20M12 18.1l-.7 1.9M15.5 18.1l-.7 1.9"></path></svg>`
   };
   return icons[name] || icons.mark;
 }

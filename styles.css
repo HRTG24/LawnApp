@@ -99,8 +99,8 @@ svg {
   min-height: 58px;
   gap: 12px;
   padding: calc(9px + env(safe-area-inset-top)) 14px 9px;
-  border-bottom: 1px solid var(--line);
-  background: rgba(9, 13, 11, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+  background: rgba(9, 13, 11, 0.9);
   backdrop-filter: blur(16px);
 }
 
@@ -112,8 +112,7 @@ body:not(.is-home) .top-bar {
   min-width: 0;
 }
 
-.top-bar h1,
-.top-bar .eyebrow {
+.top-bar h1 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -177,7 +176,7 @@ body.is-home .views {
   display: grid;
   min-height: calc(100vh - var(--nav-height) - 36px - env(safe-area-inset-bottom));
   align-content: center;
-  gap: 24px;
+  gap: 18px;
 }
 
 .home-lockup {
@@ -212,11 +211,70 @@ body.is-home .views {
   line-height: 0.98;
 }
 
-.home-lockup p:last-child {
-  max-width: 28rem;
-  margin: 10px auto 0;
-  color: var(--muted);
-  font-size: 0.9rem;
+.home-lockup .eyebrow {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.weather-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012)),
+    rgba(17, 23, 21, 0.82);
+  padding: 10px;
+}
+
+.weather-panel h3 {
+  margin: 0 0 8px;
+  color: var(--subtle);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.weather-day {
+  display: grid;
+  min-width: 0;
+  min-height: 72px;
+  align-content: center;
+  justify-items: center;
+  gap: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.16);
+  padding: 8px 4px;
+  text-align: center;
+}
+
+.weather-day span {
+  color: var(--subtle);
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.weather-day i {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  color: var(--accent-strong);
+  font-style: normal;
+}
+
+.weather-day strong {
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .launcher-grid {
@@ -273,14 +331,6 @@ body.is-home .views {
   color: var(--muted);
   font-size: 0.8rem;
   font-weight: 750;
-}
-
-.season-note {
-  max-width: 28rem;
-  margin: 0 auto;
-  color: var(--subtle);
-  font-size: 0.78rem;
-  text-align: center;
 }
 
 .focus-panel,
@@ -653,7 +703,8 @@ body.is-home .bottom-nav {
 .brand-mark path,
 .home-mark path,
 .home-button path,
-.launcher-icon path {
+.launcher-icon path,
+.weather-day path {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
