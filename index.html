@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#0d120f">
+    <meta name="theme-color" content="#0b0f0d">
     <title>Outdoor Ops</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230d120f'/%3E%3Cpath d='M5 17h14M7 17c1-5 3-8 5-11 2 3 4 6 5 11' fill='none' stroke='%23c49a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230b0f0d'/%3E%3Cpath d='M5 17h14M7 17c1-5 3-8 5-11 2 3 4 6 5 11' fill='none' stroke='%235f8f6a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -14,13 +14,7 @@
     <div class="app-shell">
       <aside class="desktop-rail" aria-label="Primary navigation">
         <div class="brand-lockup">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M4 17h16"></path>
-              <path d="M7 17c1.2-5.3 3-8.7 5-12 2 3.3 3.8 6.7 5 12"></path>
-              <path d="M9 12h6"></path>
-            </svg>
-          </span>
+          <span class="brand-mark" aria-hidden="true" data-icon="mark"></span>
           <span>
             <strong id="rail-app-name">Outdoor Ops</strong>
             <small id="rail-app-subtitle">Field manual</small>
@@ -33,144 +27,100 @@
         <header class="top-bar">
           <div>
             <p class="eyebrow" id="top-context">Wichita area</p>
-            <h1 id="view-title">Home</h1>
+            <h1 id="view-title">Outdoor Ops</h1>
           </div>
-          <div class="phase-chip" id="phase-pill">Loading</div>
+          <button class="home-button" type="button" data-home aria-label="Home">
+            <span data-icon="mark"></span>
+          </button>
         </header>
 
         <main id="main" class="views" tabindex="-1">
-          <section class="view active" id="home-view" data-view="home" aria-labelledby="home-heading">
-            <div class="compact-head">
-              <p class="eyebrow" id="home-window"></p>
-              <h2 id="home-heading">Command Center</h2>
+          <section class="view home-view active" id="home-view" data-view="home" aria-labelledby="home-heading">
+            <div class="home-shell">
+              <div class="home-lockup">
+                <span class="home-mark" aria-hidden="true" data-icon="mark"></span>
+                <p class="eyebrow" id="home-window"></p>
+                <h2 id="home-heading">Outdoor Ops</h2>
+                <p id="home-subtitle"></p>
+              </div>
+
+              <nav class="launcher-grid" aria-label="Primary sections">
+                <button class="launcher-card" type="button" data-nav-target="plan">
+                  <span class="launcher-icon" aria-hidden="true" data-icon="plan"></span>
+                  <strong>Plan</strong>
+                  <small id="launcher-plan-note">Current phase</small>
+                </button>
+                <button class="launcher-card" type="button" data-nav-target="gear">
+                  <span class="launcher-icon" aria-hidden="true" data-icon="gear"></span>
+                  <strong>Gear</strong>
+                  <small id="launcher-gear-note">Products and settings</small>
+                </button>
+                <button class="launcher-card" type="button" data-nav-target="property">
+                  <span class="launcher-icon" aria-hidden="true" data-icon="property"></span>
+                  <strong>Property</strong>
+                  <small id="launcher-property-note">Systems and zones</small>
+                </button>
+              </nav>
+
+              <p class="season-note" id="season-note"></p>
             </div>
-
-            <section class="status-card" aria-label="Current phase">
-              <div>
-                <span class="label">Phase</span>
-                <h3 id="current-phase-title"></h3>
-              </div>
-              <p id="current-phase-copy"></p>
-            </section>
-
-            <section class="command-grid" aria-label="Operational summary">
-              <button class="command-tile" type="button" data-nav-target="plan">
-                <span>Now</span>
-                <strong id="home-now-count">0</strong>
-                <small id="home-now-label">Active tasks</small>
-              </button>
-              <button class="command-tile" type="button" data-nav-target="plan">
-                <span>Next</span>
-                <strong id="home-next-count">0</strong>
-                <small id="home-next-label">Coming up</small>
-              </button>
-              <button class="command-tile" type="button" data-nav-target="products">
-                <span>Buy</span>
-                <strong id="home-buy-count">0</strong>
-                <small id="home-buy-label">Prep checks</small>
-              </button>
-              <button class="command-tile" type="button" data-nav-target="systems">
-                <span>Weather</span>
-                <strong id="home-weather-count">0</strong>
-                <small>Watch items</small>
-              </button>
-            </section>
-
-            <section class="mini-panel">
-              <div class="panel-head">
-                <h3>Do Now</h3>
-                <button class="plain-link" type="button" data-nav-target="plan">Plan</button>
-              </div>
-              <div class="short-list" id="home-now-list"></div>
-            </section>
-
-            <section class="mini-grid">
-              <article class="mini-panel">
-                <div class="panel-head">
-                  <h3>Next</h3>
-                  <button class="plain-link" type="button" data-nav-target="plan">Open</button>
-                </div>
-                <div class="short-list" id="home-next-list"></div>
-              </article>
-              <article class="mini-panel">
-                <div class="panel-head">
-                  <h3>Buy / Prep</h3>
-                  <button class="plain-link" type="button" data-nav-target="products">Products</button>
-                </div>
-                <div class="short-list" id="home-buy-list"></div>
-              </article>
-            </section>
-
-            <section class="mini-panel">
-              <div class="panel-head">
-                <h3>Weather Watch</h3>
-                <span>Placeholder</span>
-              </div>
-              <div class="weather-strip" id="home-weather-strip"></div>
-            </section>
           </section>
 
           <section class="view" id="plan-view" data-view="plan" aria-labelledby="plan-heading">
-            <div class="compact-head">
-              <p class="eyebrow">Seasonal windows</p>
-              <h2 id="plan-heading">Plan</h2>
-            </div>
-            <div class="segmented" id="plan-filters" aria-label="Plan filter">
-              <button class="active" type="button" data-plan-filter="focus">Focus</button>
-              <button type="button" data-plan-filter="upcoming">Upcoming</button>
-              <button type="button" data-plan-filter="all">All</button>
-            </div>
-            <div class="plan-list" id="plan-list"></div>
-          </section>
+            <h2 class="visually-hidden" id="plan-heading">Plan</h2>
 
-          <section class="view" id="products-view" data-view="products" aria-labelledby="products-heading">
-            <div class="compact-head">
-              <p class="eyebrow">Store recall</p>
-              <h2 id="products-heading">Products</h2>
-            </div>
-            <div class="category-strip" id="product-category-strip" aria-label="Product categories"></div>
-            <section class="product-focus" id="product-focus" aria-live="polite"></section>
+            <section class="focus-panel">
+              <p class="eyebrow" id="plan-phase-window"></p>
+              <h3 id="plan-phase-title"></h3>
+              <p id="plan-main-recommendation"></p>
+            </section>
+
+            <section class="tight-section">
+              <h3>Support</h3>
+              <div class="support-list" id="plan-support-list"></div>
+            </section>
+
             <details class="drawer">
-              <summary>Purchase history</summary>
-              <div class="history-list" id="purchase-history"></div>
+              <summary>Look ahead</summary>
+              <div class="lookahead-list" id="plan-lookahead-list"></div>
             </details>
           </section>
 
-          <section class="view" id="systems-view" data-view="systems" aria-labelledby="systems-heading">
-            <div class="compact-head">
-              <p class="eyebrow">Operational reference</p>
-              <h2 id="systems-heading">Systems</h2>
-            </div>
-            <div class="system-list" id="systems-list"></div>
+          <section class="view" id="gear-view" data-view="gear" aria-labelledby="gear-heading">
+            <h2 class="visually-hidden" id="gear-heading">Gear</h2>
+
+            <div class="category-strip" id="gear-category-strip" aria-label="Gear categories"></div>
+            <section class="gear-focus" id="gear-focus" aria-live="polite"></section>
+
+            <details class="drawer">
+              <summary>Equipment and settings</summary>
+              <div class="dense-list" id="gear-equipment-settings"></div>
+            </details>
+
+            <details class="drawer">
+              <summary>Purchase history</summary>
+              <div class="dense-list" id="gear-purchase-history"></div>
+            </details>
           </section>
 
-          <section class="view" id="more-view" data-view="more" aria-labelledby="more-heading">
-            <div class="compact-head">
-              <p class="eyebrow">Secondary reference</p>
-              <h2 id="more-heading">More</h2>
-            </div>
-            <div class="drawer-list">
-              <details class="drawer" open>
-                <summary>Equipment</summary>
-                <div class="dense-list" id="more-equipment"></div>
-              </details>
-              <details class="drawer">
-                <summary>Zones</summary>
-                <div class="dense-list" id="more-zones"></div>
-              </details>
-              <details class="drawer">
-                <summary>Known settings</summary>
-                <div class="dense-list" id="more-settings"></div>
-              </details>
-              <details class="drawer">
-                <summary>Lessons learned</summary>
-                <ul class="lesson-list" id="more-lessons"></ul>
-              </details>
-              <details class="drawer">
-                <summary>Sources</summary>
-                <div class="dense-list" id="more-sources"></div>
-              </details>
-            </div>
+          <section class="view" id="property-view" data-view="property" aria-labelledby="property-heading">
+            <h2 class="visually-hidden" id="property-heading">Property</h2>
+
+            <section class="tight-section">
+              <h3>Systems</h3>
+              <div class="system-list" id="property-systems"></div>
+            </section>
+
+            <details class="drawer">
+              <summary>Zones and areas</summary>
+              <div class="dense-list" id="property-zones"></div>
+            </details>
+
+            <details class="drawer">
+              <summary>Lessons and references</summary>
+              <ul class="lesson-list" id="property-lessons"></ul>
+              <div class="dense-list" id="property-sources"></div>
+            </details>
           </section>
         </main>
       </div>

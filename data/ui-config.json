@@ -1,31 +1,24 @@
 {
   "navigation": [
-    { "id": "home", "label": "Home", "shortLabel": "Home", "icon": "home" },
-    { "id": "plan", "label": "Plan", "shortLabel": "Plan", "icon": "timeline" },
-    { "id": "products", "label": "Products", "shortLabel": "Products", "icon": "box" },
-    { "id": "systems", "label": "Systems", "shortLabel": "Systems", "icon": "system" },
-    { "id": "more", "label": "More", "shortLabel": "More", "icon": "book" }
+    { "id": "plan", "label": "Plan", "shortLabel": "Plan", "icon": "plan" },
+    { "id": "gear", "label": "Gear", "shortLabel": "Gear", "icon": "gear" },
+    { "id": "property", "label": "Property", "shortLabel": "Property", "icon": "property" }
   ],
-  "homeCards": [
+  "launcher": [
     {
-      "id": "current-phase",
-      "label": "Current phase",
+      "id": "plan",
+      "label": "Plan",
       "dataSource": "profile.currentSeason"
     },
     {
-      "id": "next-tasks",
-      "label": "Next tasks",
-      "dataSource": "tasks.status"
+      "id": "gear",
+      "label": "Gear",
+      "dataSource": "inventory.categories"
     },
     {
-      "id": "buy-prep",
-      "label": "Buy / prep soon",
-      "dataSource": "tasks.leadTime"
-    },
-    {
-      "id": "weather",
-      "label": "Weather-aware checks",
-      "dataSource": "profile.weatherAwareness"
+      "id": "property",
+      "label": "Property",
+      "dataSource": "systems.systems"
     }
   ]
 }
