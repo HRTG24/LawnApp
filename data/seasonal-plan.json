@@ -1,0 +1,80 @@
+{
+  "planningModel": {
+    "cadence": "Phase-based with lead-time reminders",
+    "supports": [
+      "current season",
+      "next tasks",
+      "lead-time purchasing",
+      "recurring schedules",
+      "every-other-year cycles",
+      "category-based tasks",
+      "dependencies"
+    ]
+  },
+  "phases": [
+    {
+      "id": "winter-reset",
+      "label": "Winter reset",
+      "window": "January-February",
+      "status": "complete",
+      "summary": "Minimal turf work. Service equipment, review prior season, and decide whether a soil test is needed.",
+      "leadTime": "Buy mower blade/sharpening service or soil test materials before spring growth begins."
+    },
+    {
+      "id": "spring-wake",
+      "label": "Spring wake-up",
+      "window": "March",
+      "status": "complete",
+      "summary": "Start mowing when growth begins. Keep irrigation light and avoid heavy early fertilizer.",
+      "leadTime": "Purchase crabgrass pre-emergent before the redbud/full-bloom application window if prevention is planned."
+    },
+    {
+      "id": "spring-prevention",
+      "label": "Spring prevention",
+      "window": "April",
+      "status": "active",
+      "summary": "Mow regularly, apply crabgrass prevention only if appropriate, and mark thin areas for fall.",
+      "leadTime": "Verify inventory before buying more pre-emergent. Watch rain and wind before applying product."
+    },
+    {
+      "id": "late-spring-transition",
+      "label": "Late spring transition",
+      "window": "May",
+      "status": "next",
+      "summary": "Light fertilization only if irrigation and summer care are realistic. Watch heat, weeds, and early disease pressure.",
+      "leadTime": "Confirm irrigation coverage before depending on fertilizer response."
+    },
+    {
+      "id": "summer-protection",
+      "label": "Summer protection",
+      "window": "June-Mid July",
+      "status": "upcoming",
+      "summary": "Mow high, water only as needed, and avoid forcing cool-season turf through Kansas heat.",
+      "leadTime": "If a second crabgrass preventer is needed by label timing, plan by early June."
+    },
+    {
+      "id": "fall-prep",
+      "label": "Fall prep",
+      "window": "Late July-August",
+      "status": "upcoming",
+      "summary": "Plan seed, aeration, soil testing, and fertilizer. Treat grubs only if confirmed.",
+      "leadTime": "Buy quality turf-type tall fescue seed and fall fertilizer before September demand."
+    },
+    {
+      "id": "fall-build",
+      "label": "Fall build",
+      "window": "September-October",
+      "status": "upcoming",
+      "summary": "Core aerate if needed, seed thin areas, fertilize, and keep new seed consistently moist.",
+      "leadTime": "Have seed, fertilizer, and watering plan ready before the first good September window."
+    },
+    {
+      "id": "winterizer-closeout",
+      "label": "Winterizer and closeout",
+      "window": "November-December",
+      "status": "upcoming",
+      "summary": "Apply high-nitrogen fall fertilizer, manage leaves, store equipment, and review what worked.",
+      "leadTime": "Buy winterizer before the late fall window and avoid scrambling after leaf cleanup begins."
+    }
+  ]
+}

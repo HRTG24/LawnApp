@@ -1,0 +1,33 @@
+{
+  "navigation": [
+    { "id": "home", "label": "Home", "shortLabel": "Home", "icon": "home" },
+    { "id": "seasonal", "label": "Seasonal Plan", "shortLabel": "Plan", "icon": "timeline" },
+    { "id": "inventory", "label": "Inventory", "shortLabel": "Stock", "icon": "box" },
+    { "id": "equipment", "label": "Equipment", "shortLabel": "Gear", "icon": "tool" },
+    { "id": "systems", "label": "Systems", "shortLabel": "Systems", "icon": "system" },
+    { "id": "zones", "label": "Zones", "shortLabel": "Zones", "icon": "map" },
+    { "id": "reference", "label": "Reference", "shortLabel": "Ref", "icon": "book" }
+  ],
+  "homeCards": [
+    {
+      "id": "current-phase",
+      "label": "Current phase",
+      "dataSource": "profile.currentSeason"
+    },
+    {
+      "id": "next-tasks",
+      "label": "Next tasks",
+      "dataSource": "tasks.status"
+    },
+    {
+      "id": "buy-prep",
+      "label": "Buy / prep soon",
+      "dataSource": "tasks.leadTime"
+    },
+    {
+      "id": "weather",
+      "label": "Weather-aware checks",
+      "dataSource": "profile.weatherAwareness"
+    }
+  ]
+}

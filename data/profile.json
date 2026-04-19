@@ -1,0 +1,76 @@
+{
+  "app": {
+    "name": "Outdoor Ops",
+    "subtitle": "Property field manual",
+    "version": "2026.04"
+  },
+  "property": {
+    "region": "Wichita, Kansas area",
+    "privacyNote": "Published UI intentionally avoids exact address, phone, payment, or private account details.",
+    "operatingGoal": "Healthy, low-effort outdoor systems with good timing and sane decisions."
+  },
+  "lawn": {
+    "grassType": "Tall fescue",
+    "careLevel": "Homeowner-level, practical, low effort",
+    "defaultRules": [
+      "Mow tall and avoid removing more than about one-third of the blade.",
+      "Mulch clippings unless they are clumpy, diseased, or smothering the turf.",
+      "Water deeply and infrequently when the lawn actually needs it.",
+      "Prioritize September and November fertilizer over summer color chasing.",
+      "Seed or overseed in fall when possible."
+    ]
+  },
+  "currentSeason": {
+    "asOf": "2026-04-19",
+    "phaseId": "spring-prevention",
+    "label": "Spring prevention window",
+    "window": "Mid April near Wichita",
+    "summary": "Mow as growth requires, confirm crabgrass prevention status, and observe thin or dry areas for fall planning.",
+    "nowFocus": [
+      "Mow if the turf is actively growing and tall enough.",
+      "Confirm whether crabgrass pre-emergent has already been applied.",
+      "Spot check weeds and thin areas without trying to solve everything now."
+    ],
+    "nextFocus": [
+      "Watch soil moisture after stormy periods.",
+      "Avoid heavy spring nitrogen unless irrigation and summer follow-through are realistic.",
+      "Start thinking ahead to May heat, disease pressure, and irrigation coverage."
+    ],
+    "buyPrepFocus": [
+      "Verify whether any 2025 pre-emergent or weed-control products remain usable.",
+      "Record spreader settings when any product is applied.",
+      "Keep fall seed and fertilizer planning in view, but do not rush large spring seeding."
+    ]
+  },
+  "weatherAwareness": {
+    "status": "placeholder",
+    "summary": "Live weather is not integrated yet. Use this area as the future hook for weather-aware recommendations.",
+    "checks": [
+      {
+        "id": "freeze-risk",
+        "label": "Freeze risk",
+        "meaning": "Delay sprinkler startup, seeding, or tender plant work if hard freezes are likely."
+      },
+      {
+        "id": "upcoming-rain",
+        "label": "Upcoming rain",
+        "meaning": "Useful for watering in fertilizer/pre-emergent, risky if storms may wash product away."
+      },
+      {
+        "id": "heat-stress",
+        "label": "Heat stress",
+        "meaning": "Raise mowing height, avoid pushing nitrogen, and water only when turf shows need."
+      },
+      {
+        "id": "wind-application",
+        "label": "Wind/application caution",
+        "meaning": "Avoid herbicide or granular applications when wind or storms make coverage unreliable."
+      },
+      {
+        "id": "irrigation-relevance",
+        "label": "Irrigation relevance",
+        "meaning": "Rain, soil moisture, and startup status should influence watering recommendations."
+      }
+    ]
+  }
+}

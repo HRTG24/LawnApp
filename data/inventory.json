@@ -1,0 +1,71 @@
+{
+  "inventoryPolicy": {
+    "displayMode": "reference",
+    "stockCaution": "Purchased quantities are known, but remaining on-hand quantities should be verified before acting.",
+    "reorderLogic": "Use purchase history plus current tasks to surface buy-ahead reminders."
+  },
+  "items": [
+    {
+      "id": "scotts-halts-crabgrass-preventer",
+      "name": "Scotts Turf Builder Halts Crabgrass Preventer",
+      "category": "pre-emergent",
+      "knownPurchasedQuantity": 2,
+      "unitSize": "13.58 lb",
+      "coverage": "5,000 sq ft each",
+      "lastPurchased": "2025-03-18",
+      "stockStatus": "verify",
+      "useTiming": "April around redbud full bloom if crabgrass prevention is planned",
+      "reorderTiming": "February-March before spring application window",
+      "notes": "Water in according to label. Avoid heavy storm washout."
+    },
+    {
+      "id": "scotts-weed-feed5",
+      "name": "Scotts Turf Builder Weed & Feed5",
+      "category": "weed control / fertilizer",
+      "knownPurchasedQuantity": 2,
+      "unitSize": "11.32 lb",
+      "coverage": "4,000 sq ft each",
+      "lastPurchased": "2025-03-18",
+      "stockStatus": "verify",
+      "useTiming": "Only when weeds and label conditions justify it",
+      "reorderTiming": "Do not reorder automatically; decide based on actual weed pressure",
+      "notes": "Avoid unnecessary fertilizer push, especially heading into heat."
+    },
+    {
+      "id": "scotts-lawn-soil",
+      "name": "Scotts Turf Builder Lawn Soil",
+      "category": "soil amendment",
+      "knownPurchasedQuantity": 3,
+      "unitSize": "1.5 cu ft",
+      "lastPurchased": "2025-03-18",
+      "stockStatus": "verify",
+      "useTiming": "Small repair areas, leveling, or seed support where useful",
+      "reorderTiming": "Buy only for a defined repair or seed plan",
+      "notes": "Do not treat bagged soil as a substitute for solving compaction or irrigation issues."
+    },
+    {
+      "id": "scotts-tall-fescue-mix",
+      "name": "Scotts Turf Builder Tall Fescue Mix",
+      "category": "seed",
+      "knownPurchasedQuantity": 1,
+      "unitSize": "2.4 lb",
+      "lastPurchased": "2025-03-18",
+      "stockStatus": "verify",
+      "useTiming": "Best saved for September thin spots or small repairs",
+      "reorderTiming": "Late July-August if fall seeding is planned",
+      "notes": "Fall seeding is easier than spring/summer establishment near Wichita."
+    },
+    {
+      "id": "premium-dark-brown-mulch",
+      "name": "Premium Dark Brown Mulch",
+      "category": "mulch",
+      "knownPurchasedQuantity": 120,
+      "unitSize": "2 cu ft",
+      "lastPurchased": "2025-04-01",
+      "stockStatus": "historical",
+      "useTiming": "Spring bed refresh as needed",
+      "reorderTiming": "Review every other year or when beds visibly need refresh",
+      "notes": "Large 2025 purchase supports an every-other-year planning assumption unless conditions change."
+    }
+  ]
+}

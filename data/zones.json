@@ -1,0 +1,48 @@
+{
+  "zones": [
+    {
+      "id": "front-visible",
+      "name": "Front / high visibility",
+      "category": "lawn",
+      "condition": "Priority presentation area",
+      "strategy": "Keep mowing clean, monitor weeds, and avoid cosmetic overreaction during heat.",
+      "recommendations": [
+        "Use this zone for visible turf quality decisions.",
+        "Mark thin spots for fall seed instead of pushing spring fixes."
+      ]
+    },
+    {
+      "id": "dry-edges",
+      "name": "Dry / hot edges",
+      "category": "lawn",
+      "condition": "Likely to show wilt or heat stress first",
+      "strategy": "Check irrigation coverage and soil moisture before fertilizer or seed decisions.",
+      "recommendations": [
+        "Watch for footprints that do not rebound.",
+        "Use this zone to calibrate watering decisions."
+      ]
+    },
+    {
+      "id": "thin-repair-areas",
+      "name": "Thin / repair areas",
+      "category": "lawn",
+      "condition": "Potential fall seed targets",
+      "strategy": "Track areas for September seed, aeration, soil correction, or watering changes.",
+      "recommendations": [
+        "Avoid large spring seeding unless there is no alternative.",
+        "Pair fall seed plans with watering and soil prep."
+      ]
+    },
+    {
+      "id": "shade-traffic",
+      "name": "Shade / traffic",
+      "category": "lawn",
+      "condition": "May behave differently from open turf",
+      "strategy": "Reduce traffic when wet and decide whether turf is realistic in the area.",
+      "recommendations": [
+        "Do not treat shade failure as a simple fertilizer problem.",
+        "Consider non-turf solutions if grass repeatedly fails."
+      ]
+    }
+  ]
+}

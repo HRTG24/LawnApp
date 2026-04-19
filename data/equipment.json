@@ -1,0 +1,38 @@
+{
+  "equipment": [
+    {
+      "id": "mower",
+      "name": "Mower",
+      "category": "cutting",
+      "status": "active",
+      "knownSettings": ["mower-height-default"],
+      "maintenance": [
+        "Sharpen blade before spring growth or whenever cut quality declines.",
+        "Keep tall fescue on the higher side.",
+        "Do not remove more than about one-third of the blade at once."
+      ],
+      "operatingNotes": "Mulch clippings unless they are clumpy, diseased, or smothering the turf."
+    },
+    {
+      "id": "broadcast-spreader",
+      "name": "Broadcast spreader",
+      "category": "application",
+      "status": "settings incomplete",
+      "knownSettings": ["spreader-general-default"],
+      "maintenance": [
+        "Clean after fertilizer or herbicide use.",
+        "Record exact setting, product, rate, and result after each application."
+      ],
+      "operatingNotes": "Use label guidance first. Start conservatively if the exact model setting is unknown."
+    },
+    {
+      "id": "rain-gauge",
+      "name": "Rain gauge / catch-can test",
+      "category": "measurement",
+      "status": "recommended",
+      "knownSettings": [],
+      "maintenance": [],
+      "operatingNotes": "Use for sprinkler output testing and rain verification before changing irrigation habits."
+    }
+  ]
+}

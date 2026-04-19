@@ -1,0 +1,37 @@
+{
+  "systems": [
+    {
+      "id": "irrigation-system",
+      "name": "Irrigation system",
+      "category": "water",
+      "status": "details unknown",
+      "seasonalTasks": ["irrigation-startup-backflow", "irrigation-coverage-check"],
+      "notes": [
+        "Coverage and zone layout should be verified before relying on summer irrigation.",
+        "Use soil moisture and weather, not calendar habit alone, to decide when to water."
+      ]
+    },
+    {
+      "id": "backflow-preventer",
+      "name": "Backflow preventer",
+      "category": "water safety",
+      "status": "seasonal check required",
+      "seasonalTasks": ["irrigation-startup-backflow"],
+      "notes": [
+        "Spring startup should account for freeze risk.",
+        "Store future inspection, startup, or winterization notes here."
+      ]
+    },
+    {
+      "id": "mulch-beds",
+      "name": "Mulch beds",
+      "category": "beds",
+      "status": "every-other-year review",
+      "seasonalTasks": ["mulch-cycle-review"],
+      "notes": [
+        "Large 2025 mulch purchase suggests review before automatically buying more.",
+        "Refresh based on bed condition, washout, color, and weed pressure."
+      ]
+    }
+  ]
+}
