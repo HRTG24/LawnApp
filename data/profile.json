@@ -5,7 +5,7 @@
     "version": "2026.04"
   },
   "property": {
-    "region": "Wichita, Kansas area",
+    "region": "Valley Center, KS",
     "privacyNote": "Published UI intentionally avoids exact address, phone, payment, or private account details.",
     "operatingGoal": "Healthy, low-effort outdoor systems with good timing and sane decisions."
   },
@@ -24,7 +24,7 @@
     "asOf": "2026-04-19",
     "phaseId": "spring-prevention",
     "label": "Spring prevention window",
-    "window": "Mid April near Wichita",
+    "window": "Mid April",
     "summary": "Mow as growth requires, confirm crabgrass prevention status, and observe thin or dry areas for fall planning.",
     "nowFocus": [
       "Mow if the turf is actively growing and tall enough.",
@@ -44,6 +44,10 @@
   },
   "weatherAwareness": {
     "status": "placeholder",
+    "location": {
+      "label": "Valley Center, KS",
+      "zip": "67147"
+    },
     "summary": "Live weather is not integrated yet. Use this area as the future hook for weather-aware recommendations.",
     "forecast": [
       {

@@ -8,12 +8,48 @@
   --muted: #aeb7af;
   --subtle: #77827a;
   --line: rgba(255, 255, 255, 0.09);
+  --line-soft: rgba(255, 255, 255, 0.065);
   --line-strong: rgba(95, 143, 106, 0.42);
   --accent: #5f8f6a;
   --accent-strong: #78a982;
+  --accent-soft: rgba(95, 143, 106, 0.12);
+  --body-start: #0d1310;
+  --panel-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.014));
+  --inner-bg: rgba(0, 0, 0, 0.16);
+  --inner-line: rgba(255, 255, 255, 0.07);
+  --chrome-bg: rgba(9, 13, 11, 0.9);
+  --nav-bg: rgba(9, 13, 11, 0.95);
+  --rail-bg: rgba(11, 15, 13, 0.84);
+  --skip-ink: #071009;
   --shadow: 0 18px 46px rgba(0, 0, 0, 0.34);
   --radius: 8px;
   --nav-height: 70px;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #eef2ea;
+  --surface: #f8faf4;
+  --surface-2: #eef4eb;
+  --surface-3: #dfe9de;
+  --ink: #172017;
+  --muted: #536154;
+  --subtle: #788477;
+  --line: rgba(23, 32, 23, 0.13);
+  --line-soft: rgba(23, 32, 23, 0.09);
+  --line-strong: rgba(63, 122, 80, 0.36);
+  --accent: #3f7a50;
+  --accent-strong: #2f6d43;
+  --accent-soft: rgba(63, 122, 80, 0.1);
+  --body-start: #f8faf2;
+  --panel-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.22));
+  --inner-bg: rgba(22, 47, 28, 0.045);
+  --inner-line: rgba(22, 47, 28, 0.09);
+  --chrome-bg: rgba(247, 250, 244, 0.9);
+  --nav-bg: rgba(247, 250, 244, 0.95);
+  --rail-bg: rgba(244, 248, 241, 0.9);
+  --skip-ink: #f8faf4;
+  --shadow: 0 14px 34px rgba(31, 45, 34, 0.13);
 }
 
 * {
@@ -33,7 +69,7 @@ html {
 body {
   min-height: 100%;
   margin: 0;
-  background: linear-gradient(180deg, #0d1310 0, var(--bg) 360px);
+  background: linear-gradient(180deg, var(--body-start) 0, var(--bg) 360px);
 }
 
 button {
@@ -60,7 +96,7 @@ svg {
   transform: translateY(-140%);
   border-radius: var(--radius);
   background: var(--accent-strong);
-  color: #071009;
+  color: var(--skip-ink);
   padding: 9px 12px;
   font-weight: 900;
 }
@@ -99,8 +135,8 @@ svg {
   min-height: 58px;
   gap: 12px;
   padding: calc(9px + env(safe-area-inset-top)) 14px 9px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.065);
-  background: rgba(9, 13, 11, 0.9);
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--chrome-bg);
   backdrop-filter: blur(16px);
 }
 
@@ -135,6 +171,7 @@ body:not(.is-home) .top-bar {
   border-radius: var(--radius);
   background: var(--surface-2);
   color: var(--accent-strong);
+  padding: 0;
 }
 
 .home-button span {
@@ -192,10 +229,11 @@ body.is-home .views {
   border: 1px solid var(--line-strong);
   border-radius: 16px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.01)),
+    var(--panel-gradient),
     var(--surface-2);
   color: var(--accent-strong);
   box-shadow: var(--shadow);
+  padding: 0;
 }
 
 .home-mark svg {
@@ -220,8 +258,8 @@ body.is-home .views {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012)),
-    rgba(17, 23, 21, 0.82);
+    var(--panel-gradient),
+    var(--surface);
   padding: 10px;
 }
 
@@ -247,9 +285,9 @@ body.is-home .views {
   align-content: center;
   justify-items: center;
   gap: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.065);
+  border: 1px solid var(--line-soft);
   border-radius: 7px;
-  background: rgba(0, 0, 0, 0.16);
+  background: var(--inner-bg);
   padding: 8px 4px;
   text-align: center;
 }
@@ -293,7 +331,7 @@ body.is-home .views {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015)),
+    var(--panel-gradient),
     var(--surface);
   color: var(--ink);
   padding: 14px;
@@ -307,9 +345,9 @@ body.is-home .views {
   width: 42px;
   height: 42px;
   place-items: center;
-  border: 1px solid rgba(95, 143, 106, 0.36);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius);
-  background: rgba(95, 143, 106, 0.12);
+  background: var(--accent-soft);
   color: var(--accent-strong);
 }
 
@@ -341,7 +379,7 @@ body.is-home .views {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.048), rgba(255, 255, 255, 0.014)),
+    var(--panel-gradient),
     var(--surface);
   box-shadow: var(--shadow);
 }
@@ -349,7 +387,12 @@ body.is-home .views {
 .focus-panel {
   margin-bottom: 11px;
   padding: 14px;
-  border-color: rgba(95, 143, 106, 0.3);
+  border-color: var(--line-strong);
+}
+
+.drawer > .focus-panel {
+  margin: 0 12px 12px;
+  padding: 12px;
 }
 
 .focus-panel h3,
@@ -391,9 +434,9 @@ body.is-home .views {
 
 .signal-row,
 .dense-item {
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--inner-line);
   border-radius: var(--radius);
-  background: rgba(0, 0, 0, 0.16);
+  background: var(--inner-bg);
   padding: 9px;
 }
 
@@ -496,7 +539,7 @@ body.is-home .views {
 
 .category-strip button.active {
   border-color: var(--line-strong);
-  background: rgba(95, 143, 106, 0.14);
+  background: var(--accent-soft);
   color: var(--ink);
 }
 
@@ -520,10 +563,45 @@ body.is-home .views {
   margin-bottom: 10px;
 }
 
+.gear-head.compact {
+  margin-top: 12px;
+}
+
+.product-filter {
+  display: flex;
+  gap: 7px;
+  margin: 0 -12px 10px;
+  overflow-x: auto;
+  padding: 0 12px 2px;
+  scrollbar-width: none;
+}
+
+.product-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.product-filter button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  border: 1px solid var(--inner-line);
+  border-radius: 999px;
+  background: var(--inner-bg);
+  color: var(--muted);
+  padding: 7px 11px;
+  font-size: 0.74rem;
+  font-weight: 900;
+}
+
+.product-filter button.active {
+  border-color: var(--line-strong);
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
 .gear-card {
-  border: 1px solid rgba(255, 255, 255, 0.075);
+  border: 1px solid var(--inner-line);
   border-radius: var(--radius);
-  background: rgba(0, 0, 0, 0.16);
+  background: var(--inner-bg);
   padding: 10px;
 }
 
@@ -552,7 +630,7 @@ body.is-home .views {
   min-height: 24px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  background: rgba(95, 143, 106, 0.12);
+  background: var(--accent-soft);
   color: var(--accent-strong);
   padding: 3px 8px;
   font-size: 0.66rem;
@@ -569,7 +647,7 @@ body.is-home .views {
 }
 
 .gear-meta span {
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--inner-line);
   border-radius: 6px;
   color: var(--muted);
   padding: 7px;
@@ -606,9 +684,9 @@ body.is-home .views {
 
 .pill-row span {
   flex: 0 0 auto;
-  border: 1px solid rgba(95, 143, 106, 0.32);
+  border: 1px solid var(--line-strong);
   border-radius: 999px;
-  background: rgba(95, 143, 106, 0.1);
+  background: var(--accent-soft);
   color: var(--muted);
   padding: 5px 8px;
   font-size: 0.72rem;
@@ -644,7 +722,7 @@ body.is-home .views {
   grid-template-columns: repeat(3, 1fr);
   min-height: calc(var(--nav-height) + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
-  background: rgba(9, 13, 11, 0.95);
+  background: var(--nav-bg);
   padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
   backdrop-filter: blur(16px);
 }
@@ -669,8 +747,8 @@ body.is-home .bottom-nav {
 }
 
 .nav-item.active {
-  border-color: rgba(95, 143, 106, 0.4);
-  background: rgba(95, 143, 106, 0.14);
+  border-color: var(--line-strong);
+  background: var(--accent-soft);
   color: var(--ink);
 }
 
@@ -690,8 +768,9 @@ body.is-home .bottom-nav {
   height: 40px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
-  background: rgba(95, 143, 106, 0.12);
+  background: var(--accent-soft);
   color: var(--accent-strong);
+  padding: 0;
 }
 
 .brand-mark svg {
@@ -716,7 +795,7 @@ button:focus-visible,
 a:focus-visible,
 main:focus-visible,
 summary:focus-visible {
-  outline: 3px solid rgba(95, 143, 106, 0.38);
+  outline: 3px solid var(--line-strong);
   outline-offset: 2px;
 }
 
@@ -769,7 +848,7 @@ button:active {
     display: block;
     height: 100vh;
     border-right: 1px solid var(--line);
-    background: rgba(11, 15, 13, 0.84);
+    background: var(--rail-bg);
     padding: 20px 14px;
   }
 

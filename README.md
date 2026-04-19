@@ -1,6 +1,6 @@
 # Outdoor Ops Property Field Manual
 
-This is a compact, mobile-first, GitHub Pages friendly outdoor operations utility app for the Wichita-area property context.
+This is a compact, mobile-first, GitHub Pages friendly outdoor operations utility app for the Valley Center, KS property context.
 
 The goal is not browser-side data entry. The site is a read-first source of truth that Codex updates after ChatGPT conversations summarize changed decisions, purchases, equipment notes, weather considerations, or seasonal plans.
 

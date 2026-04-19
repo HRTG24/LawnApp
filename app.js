@@ -11,21 +11,30 @@ const DATA_FILES = {
   ui: "data/ui-config.json"
 };
 
+const THEME_KEY = "outdoorOpsTheme";
+const THEME_COLORS = {
+  dark: "#0b0f0d",
+  light: "#f1f4ed"
+};
+
 const state = {
   data: null,
   activeView: "home",
-  activeGearCategory: "pre-emergent"
+  activeGearSection: "products",
+  activeProductCategory: "pre-emergent"
 };
 
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
   try {
+    applyTheme(readStoredTheme());
     state.data = await loadData();
-    state.activeGearCategory = state.data.inventory.categories[0]?.id || "pre-emergent";
+    state.activeProductCategory = state.data.inventory.categories[0]?.id || "pre-emergent";
     hydrateIcons();
     renderApp();
     bindNavigation();
+    bindThemeToggle();
     bindGearCategories();
     showView("home", { focus: false });
   } catch (error) {
@@ -91,10 +100,17 @@ function bindNavigation() {
 
 function bindGearCategories() {
   document.querySelector("#gear-category-strip").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-gear-category]");
+    const button = event.target.closest("[data-gear-section]");
     if (!button) return;
-    state.activeGearCategory = button.dataset.gearCategory;
+    state.activeGearSection = button.dataset.gearSection;
     renderGearCategories();
+    renderGear();
+  });
+
+  document.querySelector("#gear-focus").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-product-category]");
+    if (!button) return;
+    state.activeProductCategory = button.dataset.productCategory;
     renderGear();
   });
 }
@@ -117,17 +133,20 @@ function showView(view, options = {}) {
 }
 
 function renderHome() {
-  const { profile, inventory, systems } = state.data;
+  const { profile, systems } = state.data;
   const season = profile.currentSeason;
-  text("#home-window", `${season.window} / ${formatDate(season.asOf)}`);
+  const location = profile.weatherAwareness.location?.label || profile.property.region;
+  text("#home-window", `${season.label} / ${location} / ${formatDate(season.asOf)}`);
   text("#launcher-plan-note", season.label);
-  text("#launcher-gear-note", `${inventory.categories.length} categories`);
+  text("#launcher-gear-note", "Products / equipment");
   text("#launcher-property-note", `${systems.systems.length} systems`);
   renderWeatherPanel();
 }
 
 function renderWeatherPanel() {
-  const forecast = state.data.profile.weatherAwareness.forecast || [];
+  const weather = state.data.profile.weatherAwareness;
+  const forecast = weather.forecast || [];
+  text("#weather-heading", `3-day outlook / ${weather.location?.label || "Weather"}`);
   document.querySelector("#weather-grid").innerHTML = forecast.slice(0, 3).map((day) => `
     <article class="weather-day" title="${escapeHtml(day.condition || "")}">
       <span>${escapeHtml(day.day)}</span>
@@ -175,25 +194,53 @@ function renderPlan() {
 }
 
 function renderGearCategories() {
-  const { inventory } = state.data;
-  document.querySelector("#gear-category-strip").innerHTML = inventory.categories.map((category) => {
-    const count = gearItems(category.id).length;
+  document.querySelector("#gear-category-strip").innerHTML = gearSections().map((category) => {
     return `
-      <button class="${category.id === state.activeGearCategory ? "active" : ""}" type="button" data-gear-category="${category.id}">
+      <button class="${category.id === state.activeGearSection ? "active" : ""}" type="button" data-gear-section="${category.id}">
         <span>${escapeHtml(category.label)}</span>
-        <small>${count ? `${count} item${count === 1 ? "" : "s"}` : "empty"}</small>
+        <small>${escapeHtml(category.note)}</small>
       </button>
     `;
   }).join("");
 }
 
 function renderGear() {
-  const { inventory, equipment, settings, purchases } = state.data;
-  const category = inventory.categories.find((item) => item.id === state.activeGearCategory) || inventory.categories[0];
-  const items = gearItems(category.id);
+  if (state.activeGearSection === "equipment") {
+    renderEquipmentGear();
+    return;
+  }
 
+  if (state.activeGearSection === "settings") {
+    renderSettingsGear();
+    return;
+  }
+
+  if (state.activeGearSection === "history") {
+    renderPurchaseHistoryGear();
+    return;
+  }
+
+  renderProductsGear();
+}
+
+function renderProductsGear() {
+  const { inventory } = state.data;
+  const category = inventory.categories.find((item) => item.id === state.activeProductCategory) || inventory.categories[0];
+  const items = gearItems(category.id);
   document.querySelector("#gear-focus").innerHTML = `
     <div class="gear-head">
+      <span class="label">Product reference</span>
+      <h3>Products</h3>
+      <p>Browse usual buys by category. Purchase history is separate so this stays usable in a store.</p>
+    </div>
+    <div class="product-filter" aria-label="Product categories">
+      ${inventory.categories.map((item) => `
+        <button class="${item.id === category.id ? "active" : ""}" type="button" data-product-category="${item.id}">
+          ${escapeHtml(item.label)}
+        </button>
+      `).join("")}
+    </div>
+    <div class="gear-head compact">
       <span class="label">${escapeHtml(category.storeQuestion)}</span>
       <h3>${escapeHtml(category.label)}</h3>
       <p>${escapeHtml(category.defaultTiming)}</p>
@@ -202,27 +249,58 @@ function renderGear() {
       ${items.map(gearCard).join("") || emptyGear(category)}
     </div>
   `;
+}
 
+function renderEquipmentGear() {
+  const { equipment, settings } = state.data;
   const settingMap = new Map(settings.settings.map((setting) => [setting.id, setting]));
   const equipmentItems = equipment.equipment.map((item) => {
     const linkedSettings = (item.knownSettings || []).map((id) => settingMap.get(id)).filter(Boolean);
     const settingText = linkedSettings.map((setting) => `${setting.label}: ${setting.value}`).join(" / ");
     return denseItem(item.name, item.status, settingText || item.operatingNotes);
   }).join("");
-
-  const generalSettings = settings.settings
-    .filter((setting) => !equipment.equipment.some((item) => (item.knownSettings || []).includes(setting.id)))
-    .map((setting) => denseItem(setting.label, setting.confidence, setting.value))
-    .join("");
-
-  document.querySelector("#gear-equipment-settings").innerHTML = equipmentItems + generalSettings;
-  document.querySelector("#gear-purchase-history").innerHTML = purchases.purchases.map((purchase) => `
-    <div class="dense-item">
-      <strong>${escapeHtml(purchase.vendor)} / ${formatDate(purchase.date)}</strong>
-      <span>No private receipt details</span>
-      <p>${purchase.items.map((item) => `${item.quantity} x ${escapeHtml(item.name)}`).join(" / ")}</p>
+  document.querySelector("#gear-focus").innerHTML = `
+    <div class="gear-head">
+      <span class="label">Tools and defaults</span>
+      <h3>Equipment</h3>
+      <p>Current tools, operating notes, and linked settings.</p>
     </div>
-  `).join("");
+    <div class="dense-list">${equipmentItems}</div>
+  `;
+}
+
+function renderSettingsGear() {
+  const { settings } = state.data;
+  document.querySelector("#gear-focus").innerHTML = `
+    <div class="gear-head">
+      <span class="label">Known values</span>
+      <h3>Settings</h3>
+      <p>Recorded spreader, mowing, and operating defaults.</p>
+    </div>
+    <div class="dense-list">
+      ${settings.settings.map((setting) => denseItem(setting.label, setting.confidence, setting.value)).join("")}
+    </div>
+  `;
+}
+
+function renderPurchaseHistoryGear() {
+  const { purchases } = state.data;
+  document.querySelector("#gear-focus").innerHTML = `
+    <div class="gear-head">
+      <span class="label">Sanitized receipts</span>
+      <h3>Purchase History</h3>
+      <p>Useful product memory only. Private receipt details stay out of the UI.</p>
+    </div>
+    <div class="dense-list">
+      ${purchases.purchases.map((purchase) => `
+        <div class="dense-item">
+          <strong>${escapeHtml(purchase.vendor)} / ${formatDate(purchase.date)}</strong>
+          <span>No private receipt details</span>
+          <p>${purchase.items.map((item) => `${item.quantity} x ${escapeHtml(item.name)}`).join(" / ")}</p>
+        </div>
+      `).join("")}
+    </div>
+  `;
 }
 
 function gearCard(item) {
@@ -302,6 +380,16 @@ function gearItems(categoryId) {
   });
 }
 
+function gearSections() {
+  const { inventory, equipment, purchases, settings } = state.data;
+  return [
+    { id: "products", label: "Products", note: `${inventory.items.length} usual buys` },
+    { id: "equipment", label: "Equipment", note: `${equipment.equipment.length} tools` },
+    { id: "settings", label: "Settings", note: `${settings.settings.length} known` },
+    { id: "history", label: "Purchase History", note: `${purchases.purchases.length} orders` }
+  ];
+}
+
 function denseItem(title, meta, body) {
   return `
     <div class="dense-item">
@@ -326,6 +414,35 @@ function hydrateIcons() {
   document.querySelectorAll("[data-icon]").forEach((element) => {
     element.innerHTML = icon(element.dataset.icon);
   });
+}
+
+function bindThemeToggle() {
+  document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextTheme = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+      applyTheme(nextTheme);
+      try {
+        localStorage.setItem(THEME_KEY, nextTheme);
+      } catch (error) {
+        // Theme persistence is a convenience; the toggle still works without storage.
+      }
+    });
+  });
+}
+
+function readStoredTheme() {
+  try {
+    return localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
+  } catch (error) {
+    return "dark";
+  }
+}
+
+function applyTheme(theme) {
+  const safeTheme = theme === "light" ? "light" : "dark";
+  document.documentElement.dataset.theme = safeTheme;
+  const themeColor = document.querySelector("meta[name='theme-color']");
+  if (themeColor) themeColor.setAttribute("content", THEME_COLORS[safeTheme]);
 }
 
 function emptyState(message) {

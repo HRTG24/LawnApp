@@ -6,6 +6,13 @@
     <meta name="theme-color" content="#0b0f0d">
     <title>Outdoor Ops</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230b0f0d'/%3E%3Cpath d='M4.5 18.5h15M7 18.5c.3-3.4 1.4-5.8 3.3-7.5M11.2 18.5c-.1-4.5.5-8.5 1.8-12.3M15 18.5c.2-3.8 1-6.5 2.4-8.5' fill='none' stroke='%235f8f6a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <script>
+      try {
+        document.documentElement.dataset.theme = localStorage.getItem("outdoorOpsTheme") || "dark";
+      } catch (error) {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -14,7 +21,7 @@
     <div class="app-shell">
       <aside class="desktop-rail" aria-label="Primary navigation">
         <div class="brand-lockup">
-          <span class="brand-mark" aria-hidden="true" data-icon="mark"></span>
+          <button class="brand-mark" type="button" data-theme-toggle aria-label="Toggle theme" data-icon="mark"></button>
           <span>
             <strong id="rail-app-name">Outdoor Ops</strong>
             <small id="rail-app-subtitle">Field manual</small>
@@ -28,7 +35,7 @@
           <div>
             <h1 id="view-title">Outdoor Ops</h1>
           </div>
-          <button class="home-button" type="button" data-home aria-label="Home">
+          <button class="home-button" type="button" data-home data-theme-toggle aria-label="Home">
             <span data-icon="mark"></span>
           </button>
         </header>
@@ -37,7 +44,7 @@
           <section class="view home-view active" id="home-view" data-view="home" aria-labelledby="home-heading">
             <div class="home-shell">
               <div class="home-lockup">
-                <span class="home-mark" aria-hidden="true" data-icon="mark"></span>
+                <button class="home-mark" type="button" data-theme-toggle aria-label="Toggle theme" data-icon="mark"></button>
                 <h2 id="home-heading">Outdoor Ops</h2>
                 <p class="eyebrow" id="home-window"></p>
               </div>
@@ -71,16 +78,19 @@
           <section class="view" id="plan-view" data-view="plan" aria-labelledby="plan-heading">
             <h2 class="visually-hidden" id="plan-heading">Plan</h2>
 
-            <section class="focus-panel">
-              <p class="eyebrow" id="plan-phase-window"></p>
-              <h3 id="plan-phase-title"></h3>
-              <p id="plan-main-recommendation"></p>
-            </section>
+            <details class="drawer">
+              <summary>Current phase</summary>
+              <div class="focus-panel">
+                <p class="eyebrow" id="plan-phase-window"></p>
+                <h3 id="plan-phase-title"></h3>
+                <p id="plan-main-recommendation"></p>
+              </div>
+            </details>
 
-            <section class="tight-section">
-              <h3>Support</h3>
+            <details class="drawer">
+              <summary>Support</summary>
               <div class="support-list" id="plan-support-list"></div>
-            </section>
+            </details>
 
             <details class="drawer">
               <summary>Look ahead</summary>
@@ -93,25 +103,15 @@
 
             <div class="category-strip" id="gear-category-strip" aria-label="Gear categories"></div>
             <section class="gear-focus" id="gear-focus" aria-live="polite"></section>
-
-            <details class="drawer">
-              <summary>Equipment and settings</summary>
-              <div class="dense-list" id="gear-equipment-settings"></div>
-            </details>
-
-            <details class="drawer">
-              <summary>Purchase history</summary>
-              <div class="dense-list" id="gear-purchase-history"></div>
-            </details>
           </section>
 
           <section class="view" id="property-view" data-view="property" aria-labelledby="property-heading">
             <h2 class="visually-hidden" id="property-heading">Property</h2>
 
-            <section class="tight-section">
-              <h3>Systems</h3>
+            <details class="drawer">
+              <summary>Systems</summary>
               <div class="system-list" id="property-systems"></div>
-            </section>
+            </details>
 
             <details class="drawer">
               <summary>Zones and areas</summary>
