@@ -567,6 +567,55 @@ body.is-home .views {
   margin-top: 12px;
 }
 
+.gear-group {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.gear-group h4 {
+  margin: 0;
+  color: var(--subtle);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin: 10px 0 12px;
+}
+
+.metric-grid div {
+  border: 1px solid var(--inner-line);
+  border-radius: 7px;
+  background: var(--inner-bg);
+  padding: 8px 6px;
+}
+
+.metric-grid strong,
+.metric-grid span {
+  display: block;
+}
+
+.metric-grid strong {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.metric-grid span {
+  margin-top: 3px;
+  color: var(--subtle);
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
 .product-filter {
   display: flex;
   gap: 7px;
