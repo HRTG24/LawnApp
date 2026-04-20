@@ -1,80 +1,401 @@
 {
   "planningModel": {
-    "cadence": "Phase-based with lead-time reminders",
-    "supports": [
-      "current season",
-      "next tasks",
-      "lead-time purchasing",
-      "recurring schedules",
-      "every-other-year cycles",
-      "category-based tasks",
-      "dependencies"
+    "cadence": "Seasonal phase and trigger-window planning",
+    "region": "Wichita, Kansas tall fescue",
+    "intent": "Guide current-phase decisions, trigger checks, sequencing, and buy-ahead planning without becoming a rigid weekly checklist.",
+    "itemTypes": [
+      {
+        "id": "core",
+        "label": "Core",
+        "meaning": "Annual or high-value seasonal event."
+      },
+      {
+        "id": "weather",
+        "label": "Weather",
+        "meaning": "Decision depends on forecast, soil moisture, temperature, wind, or rain."
+      },
+      {
+        "id": "conditional",
+        "label": "Conditional",
+        "meaning": "Do only if observed conditions justify it."
+      },
+      {
+        "id": "buy",
+        "label": "Buy ahead",
+        "meaning": "Purchase or stage materials before the work window."
+      }
+    ],
+    "lanes": [
+      "lawn",
+      "irrigation",
+      "shrubs",
+      "insects",
+      "purchase"
     ]
   },
+  "currentPhaseId": "early-mid-april",
+  "phaseOrder": [
+    "late-feb-march",
+    "early-mid-april",
+    "late-april-may",
+    "may-june",
+    "mid-may-mid-june",
+    "june-mid-july",
+    "late-july-august",
+    "september",
+    "november"
+  ],
   "phases": [
     {
-      "id": "winter-reset",
-      "label": "Winter reset",
-      "window": "January-February",
+      "id": "late-feb-march",
+      "label": "Late Feb-Mar Prep",
+      "window": "Late February-March",
       "status": "complete",
-      "summary": "Minimal turf work. Service equipment, review prior season, and decide whether a soil test is needed.",
-      "leadTime": "Buy mower blade/sharpening service or soil test materials before spring growth begins."
+      "summary": "Prep the season before spring timing gets tight.",
+      "mainRecommendation": "Inspect systems, watch warm 50°F+ treatment days, and buy spring materials before the April rush.",
+      "items": [
+        {
+          "id": "season-prep",
+          "title": "Season prep",
+          "type": "core",
+          "lane": "lawn",
+          "priority": "medium",
+          "guidance": "Service mower, review last year, and start scouting turf condition.",
+          "sequence": "Prep before growth accelerates."
+        },
+        {
+          "id": "irrigation-inspection",
+          "title": "Inspect irrigation",
+          "type": "weather",
+          "lane": "irrigation",
+          "priority": "medium",
+          "guidance": "Look for obvious repairs before startup decisions matter.",
+          "trigger": "Do not fully activate while hard-freeze risk remains."
+        },
+        {
+          "id": "broadleaf-spot-treatment",
+          "title": "Broadleaf spot treatment",
+          "type": "weather",
+          "lane": "lawn",
+          "priority": "low",
+          "guidance": "Spot treat only on label-safe 50°F+ days.",
+          "trigger": "Use calm weather and active weeds."
+        },
+        {
+          "id": "spring-buy-ahead",
+          "title": "Stage spring materials",
+          "type": "buy",
+          "lane": "purchase",
+          "priority": "high",
+          "guidance": "Buy pre-emergent, calibration supplies, repair parts, and early-season products.",
+          "buyAhead": "4-6 weeks before the April application window."
+        }
+      ]
     },
     {
-      "id": "spring-wake",
-      "label": "Spring wake-up",
-      "window": "March",
-      "status": "complete",
-      "summary": "Start mowing when growth begins. Keep irrigation light and avoid heavy early fertilizer.",
-      "leadTime": "Purchase crabgrass pre-emergent before the redbud/full-bloom application window if prevention is planned."
-    },
-    {
-      "id": "spring-prevention",
-      "label": "Spring prevention",
-      "window": "April",
+      "id": "early-mid-april",
+      "label": "Pre-emergent Window",
+      "window": "Early-Mid April",
       "status": "active",
-      "summary": "Mow regularly, apply crabgrass prevention only if appropriate, and mark thin areas for fall.",
-      "leadTime": "Use the 8,225 sq ft lawn area to plan pre-emergent purchases. Watch rain and wind before applying product."
+      "summary": "The spring prevention window is about timing, water-in, and avoiding unnecessary fertilizer push.",
+      "mainRecommendation": "Decide on crabgrass preventer now; buy product, apply around redbud bloom or mid-April timing, then water it in.",
+      "items": [
+        {
+          "id": "pre-emergent-decision",
+          "title": "Crabgrass preventer",
+          "type": "core",
+          "lane": "lawn",
+          "priority": "high",
+          "guidance": "April 15 is a common Kansas target; eastern redbud bloom is the practical cue.",
+          "sequence": "Buy product -> apply on a calm day -> water in."
+        },
+        {
+          "id": "water-in-window",
+          "title": "Water-in timing",
+          "type": "weather",
+          "lane": "lawn",
+          "priority": "high",
+          "guidance": "Use rain or irrigation to activate product, but avoid storm washout.",
+          "trigger": "Apply ahead of gentle rain or water according to label."
+        },
+        {
+          "id": "fertilizer-restraint",
+          "title": "Hold fertilizer push",
+          "type": "conditional",
+          "lane": "lawn",
+          "priority": "medium",
+          "guidance": "Pre-emergent comes before spring fertilizer. Spring nitrogen is optional for fescue.",
+          "condition": "Feed only if turf condition and summer follow-through justify it."
+        },
+        {
+          "id": "pre-emergent-buy",
+          "title": "Pre-emergent supply",
+          "type": "buy",
+          "lane": "purchase",
+          "priority": "high",
+          "guidance": "Two 5,000 sq ft units are the full-property planning assumption.",
+          "buyAhead": "Purchase before the April window."
+        }
+      ]
     },
     {
-      "id": "late-spring-transition",
-      "label": "Late spring transition",
-      "window": "May",
+      "id": "late-april-may",
+      "label": "Late Apr-May Adjust",
+      "window": "Late April-May",
       "status": "next",
-      "summary": "Light fertilization only if irrigation and summer care are realistic. Watch heat, weeds, and early disease pressure.",
-      "leadTime": "Confirm irrigation coverage before depending on fertilizer response."
+      "summary": "Follow-up feeding, weed control, irrigation activation, and early insect planning become the decision points.",
+      "mainRecommendation": "Check irrigation coverage and use fertilizer or weed/feed only if label conditions and lawn needs fit.",
+      "items": [
+        {
+          "id": "spring-feed-decision",
+          "title": "Optional spring feed",
+          "type": "conditional",
+          "lane": "lawn",
+          "priority": "medium",
+          "guidance": "Spring fertilizer matters less than fall for tall fescue.",
+          "condition": "Use only with realistic watering and mowing follow-through."
+        },
+        {
+          "id": "weed-feed-label",
+          "title": "Weed/feed label timing",
+          "type": "weather",
+          "lane": "lawn",
+          "priority": "medium",
+          "guidance": "Watering and rain timing depend on the exact product label.",
+          "trigger": "Treat only when weeds are present and conditions fit."
+        },
+        {
+          "id": "sprinkler-startup",
+          "title": "Sprinkler startup",
+          "type": "weather",
+          "lane": "irrigation",
+          "priority": "high",
+          "guidance": "Activate and adjust after freeze risk passes, then check coverage.",
+          "trigger": "Delay if hard-freeze risk returns."
+        },
+        {
+          "id": "insect-products-buy",
+          "title": "Warm-season pest supplies",
+          "type": "buy",
+          "lane": "purchase",
+          "priority": "medium",
+          "guidance": "Stage mosquito control and perimeter insect barrier products before pressure ramps.",
+          "buyAhead": "Before spring rains and midsummer refresh windows."
+        }
+      ]
     },
     {
-      "id": "summer-protection",
-      "label": "Summer protection",
+      "id": "may-june",
+      "label": "May-Jun Conditional",
+      "window": "May-June",
+      "status": "upcoming",
+      "summary": "Grub prevention is a conditional lane, not an automatic lawn program.",
+      "mainRecommendation": "Use grub preventer only if prior grub history or observed risk justifies it.",
+      "items": [
+        {
+          "id": "grub-preventer",
+          "title": "Grub preventer lane",
+          "type": "conditional",
+          "lane": "insects",
+          "priority": "low",
+          "guidance": "Preventive grub products are for known history, not routine guessing.",
+          "condition": "Use only with prior grub history or strong risk evidence."
+        },
+        {
+          "id": "dylox-active-damage",
+          "title": "Dylox only for active damage",
+          "type": "conditional",
+          "lane": "insects",
+          "priority": "low",
+          "guidance": "Curative grub treatment is only for active grub damage.",
+          "condition": "Confirm active damage before treating."
+        }
+      ]
+    },
+    {
+      "id": "mid-may-mid-june",
+      "label": "Bagworm Watch",
+      "window": "Mid May-Mid June",
+      "status": "upcoming",
+      "summary": "Scout susceptible trees and shrubs while larvae are small enough to manage.",
+      "mainRecommendation": "Inspect evergreens and susceptible shrubs, then treat only if activity is visible.",
+      "items": [
+        {
+          "id": "bagworm-scouting",
+          "title": "Bagworm scouting",
+          "type": "conditional",
+          "lane": "shrubs",
+          "priority": "medium",
+          "guidance": "Look for active small larvae on susceptible plants.",
+          "condition": "Treat only when activity is confirmed."
+        },
+        {
+          "id": "bagworm-spray-buy",
+          "title": "Bagworm spray ready",
+          "type": "buy",
+          "lane": "purchase",
+          "priority": "medium",
+          "guidance": "Have treatment available before June if susceptible plants have a history.",
+          "buyAhead": "Before scouting window peaks."
+        }
+      ]
+    },
+    {
+      "id": "june-mid-july",
+      "label": "Summer Setup",
       "window": "June-Mid July",
       "status": "upcoming",
-      "summary": "Mow high, water only as needed, and avoid forcing cool-season turf through Kansas heat.",
-      "leadTime": "If a second crabgrass preventer is needed by label timing, plan by early June."
+      "summary": "Shift from improvement to protection: water deeply, mow high, and avoid pushing fescue in heat.",
+      "mainRecommendation": "Consider a second pre-emergent only if the first product was short-duration; otherwise move into stress management.",
+      "items": [
+        {
+          "id": "second-pre-emergent",
+          "title": "Second pre-emergent check",
+          "type": "conditional",
+          "lane": "lawn",
+          "priority": "medium",
+          "guidance": "Many products weaken after about 60 days.",
+          "condition": "Skip if a season-long product was used."
+        },
+        {
+          "id": "summer-watering",
+          "title": "Deep watering rhythm",
+          "type": "weather",
+          "lane": "irrigation",
+          "priority": "high",
+          "guidance": "Water deeply and infrequently when turf actually needs it.",
+          "trigger": "Adjust for rain, heat stress, and soil moisture."
+        },
+        {
+          "id": "summer-mowing",
+          "title": "Higher mowing",
+          "type": "core",
+          "lane": "lawn",
+          "priority": "high",
+          "guidance": "Keep fescue taller through heat and avoid aggressive improvement work.",
+          "sequence": "Protect first, improve later."
+        },
+        {
+          "id": "mosquito-cadence",
+          "title": "Mosquito pressure",
+          "type": "weather",
+          "lane": "insects",
+          "priority": "medium",
+          "guidance": "Mosquito work becomes recurring after warm rain patterns.",
+          "trigger": "Warm weather plus standing moisture."
+        },
+        {
+          "id": "perimeter-barrier-cadence",
+          "title": "Perimeter barrier cadence",
+          "type": "conditional",
+          "lane": "insects",
+          "priority": "low",
+          "guidance": "Refresh perimeter insect barrier only when pest pressure and label timing justify it.",
+          "condition": "Spring and midsummer refreshes depend on observed pressure."
+        }
+      ]
     },
     {
-      "id": "fall-prep",
-      "label": "Fall prep",
+      "id": "late-july-august",
+      "label": "Fall Prep",
       "window": "Late July-August",
       "status": "upcoming",
-      "summary": "Plan seed, aeration, soil testing, and fertilizer. Treat grubs only if confirmed.",
-      "leadTime": "Buy quality turf-type tall fescue seed and fall fertilizer before September demand."
+      "summary": "Decide what recovery work September deserves before products disappear or schedules tighten.",
+      "mainRecommendation": "Assess summer thinning, stage seed/fertilizer, and plan irrigation support before Labor Day.",
+      "items": [
+        {
+          "id": "summer-thinning-check",
+          "title": "Thin-area assessment",
+          "type": "conditional",
+          "lane": "lawn",
+          "priority": "high",
+          "guidance": "Overseed only if summer thinning created a real target.",
+          "condition": "Mark repair zones before buying seed."
+        },
+        {
+          "id": "fall-materials-buy",
+          "title": "Fall materials",
+          "type": "buy",
+          "lane": "purchase",
+          "priority": "high",
+          "guidance": "Buy seed, fertilizer, and patch materials before September demand.",
+          "buyAhead": "Late July-August."
+        }
+      ]
     },
     {
-      "id": "fall-build",
-      "label": "Fall build",
-      "window": "September-October",
+      "id": "september",
+      "label": "September Build",
+      "window": "September",
       "status": "upcoming",
-      "summary": "Core aerate if needed, seed thin areas, fertilize, and keep new seed consistently moist.",
-      "leadTime": "Have seed, fertilizer, and watering plan ready before the first good September window."
+      "summary": "September is the highest-value tall fescue month: feed, repair, and recover.",
+      "mainRecommendation": "Prioritize Labor Day fertilization and any realistic repair or overseeding work.",
+      "items": [
+        {
+          "id": "labor-day-fertilizer",
+          "title": "Labor Day fertilizer",
+          "type": "core",
+          "lane": "lawn",
+          "priority": "high",
+          "guidance": "This is one of the major annual fescue checkpoints.",
+          "sequence": "Feed when heat is easing and irrigation support is realistic."
+        },
+        {
+          "id": "fall-overseeding",
+          "title": "Repair / overseed",
+          "type": "conditional",
+          "lane": "lawn",
+          "priority": "high",
+          "guidance": "Repair thin areas only where watering follow-through is realistic.",
+          "condition": "Use if summer thinning or bare areas justify it."
+        },
+        {
+          "id": "seed-water-trigger",
+          "title": "Seed watering",
+          "type": "weather",
+          "lane": "irrigation",
+          "priority": "high",
+          "guidance": "New seed needs consistent moisture; weather should drive irrigation adjustments.",
+          "trigger": "Warm dry spells require more frequent light watering."
+        }
+      ]
     },
     {
-      "id": "winterizer-closeout",
-      "label": "Winterizer and closeout",
-      "window": "November-December",
+      "id": "november",
+      "label": "November Closeout",
+      "window": "November",
       "status": "upcoming",
-      "summary": "Apply high-nitrogen fall fertilizer, manage leaves, store equipment, and review what worked.",
-      "leadTime": "Buy winterizer before the late fall window and avoid scrambling after leaf cleanup begins."
+      "summary": "The second major fescue checkpoint: late fall nitrogen, leaves, and broadleaf control opportunity.",
+      "mainRecommendation": "Do the November feed if conditions fit, manage leaves, and use fall broadleaf control only when weeds and label conditions align.",
+      "items": [
+        {
+          "id": "november-fertilizer",
+          "title": "November fertilizer",
+          "type": "core",
+          "lane": "lawn",
+          "priority": "high",
+          "guidance": "This matters more than chasing summer color.",
+          "sequence": "Apply before winter closeout when turf can use it."
+        },
+        {
+          "id": "fall-broadleaf",
+          "title": "Fall broadleaf control",
+          "type": "conditional",
+          "lane": "lawn",
+          "priority": "medium",
+          "guidance": "Fall is often a good broadleaf control opportunity.",
+          "condition": "Treat only if weeds are present and label conditions fit."
+        },
+        {
+          "id": "winterizer-buy",
+          "title": "Winterizer supply",
+          "type": "buy",
+          "lane": "purchase",
+          "priority": "high",
+          "guidance": "Two 5,000 sq ft units are the full-property planning assumption.",
+          "buyAhead": "Before November leaf cleanup compresses the schedule."
+        }
+      ]
     }
   ]
 }

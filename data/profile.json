@@ -27,10 +27,10 @@
   },
   "currentSeason": {
     "asOf": "2026-04-19",
-    "phaseId": "spring-prevention",
-    "label": "Spring prevention window",
+    "phaseId": "early-mid-april",
+    "label": "Pre-emergent window",
     "window": "Mid April",
-    "summary": "Mow as growth requires, confirm crabgrass prevention status, and observe thin or dry areas for fall planning.",
+    "summary": "Decide on crabgrass preventer timing, water-in conditions, and whether any spring fertility is actually worth it.",
     "nowFocus": [
       "Mow if the turf is actively growing and tall enough.",
       "Confirm whether crabgrass pre-emergent has already been applied.",

@@ -185,40 +185,134 @@ function renderWeatherPanel() {
 }
 
 function renderPlan() {
-  const { profile, tasks, seasonal } = state.data;
-  const season = profile.currentSeason;
-  const nowTasks = tasks.tasks.filter((task) => task.status === "now");
-  const nextTasks = tasks.tasks.filter((task) => task.status === "next");
-  const buyTasks = tasks.tasks.filter((task) => task.status === "buy-soon" || task.category === "prep / buying");
-  const activePhase = seasonal.phases.find((phase) => phase.id === season.phaseId);
+  const { profile, seasonal } = state.data;
+  const activePhase = currentPlanPhase();
+  const activeItems = [...(activePhase.items || [])].sort(planPrioritySort);
+  const priorityItems = activeItems.slice(0, 4);
+  const triggerItems = activeItems.filter((item) => item.type === "weather" || item.trigger).slice(0, 3);
+  const buyItems = activeItems.filter((item) => item.type === "buy" || item.buyAhead).slice(0, 3);
+  const timelinePhases = planPhaseOrder();
 
-  text("#plan-phase-window", "Current phase");
-  text("#plan-phase-title", season.label);
-  text("#plan-main-recommendation", nowTasks[0]?.notes || season.summary);
-
-  const support = uniqueById([
-    ...nowTasks.slice(0, 2),
-    ...buyTasks.slice(0, 1),
-    ...profile.weatherAwareness.checks.slice(0, 1).map((check) => ({
-      id: `weather-${check.label}`,
-      title: check.label,
-      timing: check.meaning,
-      category: "weather"
-    }))
-  ]).slice(0, 4);
-
-  document.querySelector("#plan-support-list").innerHTML = support.map((item) => `
-    <div class="signal-row">
-      <span>${escapeHtml(item.category || "task")}</span>
-      <strong>${escapeHtml(item.title)}</strong>
-      <small>${escapeHtml(item.timing || item.leadTime || "")}</small>
+  document.querySelector("#plan-phase-card").innerHTML = `
+    <div>
+      <span class="label">${escapeHtml(activePhase.window)}</span>
+      <h3>${escapeHtml(activePhase.label)}</h3>
+      <p>${escapeHtml(activePhase.mainRecommendation || activePhase.summary || profile.currentSeason.summary)}</p>
     </div>
-  `).join("");
+    <div class="plan-phase-meta">
+      <span>${escapeHtml(seasonal.planningModel.region)}</span>
+      <span>${escapeHtml(planTypeLabel("core"))}</span>
+    </div>
+  `;
 
-  document.querySelector("#plan-lookahead-list").innerHTML = [
-    ...(activePhase ? [{ title: activePhase.label, meta: activePhase.leadTime, body: activePhase.summary }] : []),
-    ...nextTasks.slice(0, 3).map((task) => ({ title: task.title, meta: task.timing, body: task.leadTime }))
-  ].map((item) => denseItem(item.title, item.meta, item.body)).join("");
+  document.querySelector("#plan-priority-list").innerHTML = priorityItems
+    .map(planItemRow)
+    .join("") || emptyState("No current phase items recorded.");
+
+  document.querySelector("#plan-trigger-list").innerHTML = triggerItems
+    .map(planMiniItem)
+    .join("") || emptyState("No trigger checks for this phase.");
+
+  document.querySelector("#plan-buy-list").innerHTML = buyItems
+    .map(planMiniItem)
+    .join("") || emptyState("No buy-ahead items for this phase.");
+
+  document.querySelector("#plan-timeline-list").innerHTML = [
+    ...timelinePhases
+  ].map((phase) => `
+    <article class="phase-row ${phase.id === activePhase.id ? "active" : ""}">
+      <span>${escapeHtml(phase.window)}</span>
+      <strong>${escapeHtml(phase.label)}</strong>
+      <small>${escapeHtml(concise(phase.summary, 96))}</small>
+    </article>
+  `).join("");
+}
+
+function currentPlanPhase() {
+  const { profile, seasonal } = state.data;
+  const preferredId = seasonal.currentPhaseId || profile.currentSeason.phaseId;
+  return seasonal.phases.find((phase) => phase.id === preferredId) ||
+    seasonal.phases.find((phase) => phase.status === "active") ||
+    seasonal.phases[0];
+}
+
+function planPhaseOrder() {
+  const { seasonal } = state.data;
+  const phaseMap = new Map(seasonal.phases.map((phase) => [phase.id, phase]));
+  return (seasonal.phaseOrder || seasonal.phases.map((phase) => phase.id))
+    .map((id) => phaseMap.get(id))
+    .filter(Boolean);
+}
+
+function planPrioritySort(a, b) {
+  const priorityRank = { high: 0, medium: 1, low: 2 };
+  const typeRank = { core: 0, weather: 1, conditional: 2, buy: 3 };
+  return (priorityRank[a.priority] ?? 4) - (priorityRank[b.priority] ?? 4) ||
+    (typeRank[a.type] ?? 4) - (typeRank[b.type] ?? 4);
+}
+
+function planItemRow(item) {
+  return `
+    <article class="plan-item ${escapeHtml(item.type)}">
+      <span class="plan-item-icon" aria-hidden="true">${icon(planTypeIcon(item.type))}</span>
+      <div>
+        <header>
+          <strong>${escapeHtml(item.title)}</strong>
+          <em>${escapeHtml(planTypeLabel(item.type))}</em>
+        </header>
+        <p>${escapeHtml(item.guidance)}</p>
+        <div class="mini-meta">
+          <span>${escapeHtml(planLaneLabel(item.lane))}</span>
+          ${item.trigger ? `<span>${escapeHtml(concise(item.trigger, 42))}</span>` : ""}
+          ${item.condition ? `<span>${escapeHtml(concise(item.condition, 42))}</span>` : ""}
+          ${item.sequence ? `<span>${escapeHtml(concise(item.sequence, 42))}</span>` : ""}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function planMiniItem(item) {
+  const note = item.buyAhead && item.guidance
+    ? `${item.buyAhead} ${item.guidance}`
+    : item.buyAhead || item.trigger || item.condition || item.sequence || item.guidance;
+  return `
+    <article class="plan-mini-item">
+      <span aria-hidden="true">${icon(planTypeIcon(item.type))}</span>
+      <div>
+        <strong>${escapeHtml(item.title)}</strong>
+        <small>${escapeHtml(concise(note, 88))}</small>
+      </div>
+    </article>
+  `;
+}
+
+function planTypeLabel(type) {
+  return {
+    core: "Core",
+    weather: "Weather",
+    conditional: "Conditional",
+    buy: "Buy ahead"
+  }[type] || "Plan";
+}
+
+function planTypeIcon(type) {
+  return {
+    core: "plan-core",
+    weather: "plan-weather",
+    conditional: "plan-conditional",
+    buy: "plan-buy"
+  }[type] || "plan-core";
+}
+
+function planLaneLabel(lane) {
+  return {
+    lawn: "Lawn",
+    irrigation: "Irrigation",
+    shrubs: "Shrubs",
+    insects: "Insects",
+    purchase: "Purchase"
+  }[lane] || lane;
 }
 
 function renderGearCategories() {
@@ -817,6 +911,10 @@ function icon(name) {
     mark: `<svg viewBox="0 0 24 24"><path d="M4.5 18.5h15"></path><path d="M7 18.5c.3-3.4 1.4-5.8 3.3-7.5"></path><path d="M11.2 18.5c-.1-4.5.5-8.5 1.8-12.3"></path><path d="M15 18.5c.2-3.8 1-6.5 2.4-8.5"></path><path d="M9.3 18.5c-.5-2.5-1.4-4.3-2.7-5.5"></path><path d="M17.2 18.5c-.2-2.5-.8-4.3-1.9-5.6"></path></svg>`,
     back: `<svg viewBox="0 0 24 24"><path d="M15 6 9 12l6 6"></path></svg>`,
     plan: `<svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"></path><path d="M8 9h8M8 13h5"></path><path d="M16 16l3 3"></path></svg>`,
+    "plan-core": `<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17 19 7"></path><path d="M5 5h14v14H5z"></path></svg>`,
+    "plan-weather": `<svg viewBox="0 0 24 24"><path d="M7.2 14.7h9.6a3 3 0 0 0 .5-6 5.1 5.1 0 0 0-9.8 1.2h-.3a2.4 2.4 0 0 0 0 4.8Z"></path><path d="M8.5 18.1 7.8 20M12 18.1l-.7 1.9M15.5 18.1l-.7 1.9"></path></svg>`,
+    "plan-conditional": `<svg viewBox="0 0 24 24"><path d="M12 4v3"></path><path d="M12 17v3"></path><path d="M4 12h3"></path><path d="M17 12h3"></path><path d="M8.2 8.2l2.2 2.2"></path><path d="M15.8 8.2l-2.2 2.2"></path><path d="M12 13.8a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"></path></svg>`,
+    "plan-buy": `<svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7L6 7Z"></path><path d="M9 7a3 3 0 0 1 6 0"></path><path d="M9 12h6"></path></svg>`,
     gear: `<svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"></path><path d="M12 3v3M12 18v3M4.2 7.5l2.6 1.5M17.2 15l2.6 1.5M4.2 16.5 6.8 15M17.2 9l2.6-1.5"></path></svg>`,
     products: `<svg viewBox="0 0 24 24"><path d="M7 4h10v4l-1.8 2.3V19a2 2 0 0 1-2 2H10.8a2 2 0 0 1-2-2v-8.7L7 8V4Z"></path><path d="M9 8h6M9 14h6"></path></svg>`,
     equipment: `<svg viewBox="0 0 24 24"><path d="M5 18h14"></path><path d="M7 18V9l4-3 6 4v8"></path><path d="M10 18v-5h4v5"></path><path d="M17 10l2-2"></path></svg>`,

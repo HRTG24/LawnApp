@@ -412,6 +412,208 @@ body.is-home .views {
   font-size: 0.88rem;
 }
 
+.plan-phase-card,
+.plan-block {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    var(--panel-gradient),
+    var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.plan-phase-card {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+  border-color: var(--line-strong);
+  padding: 13px;
+}
+
+.plan-phase-card h3 {
+  margin: 0;
+  font-size: 1.16rem;
+  font-weight: 950;
+  line-height: 1.08;
+}
+
+.plan-phase-card p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 0.87rem;
+  line-height: 1.35;
+}
+
+.plan-phase-meta,
+.plan-item header,
+.phase-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.plan-phase-meta span {
+  border: 1px solid var(--inner-line);
+  border-radius: 999px;
+  background: var(--inner-bg);
+  color: var(--subtle);
+  padding: 4px 8px;
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.plan-block {
+  margin-bottom: 10px;
+  padding: 11px;
+}
+
+.plan-block.compact {
+  margin-bottom: 0;
+}
+
+.plan-block-head {
+  margin-bottom: 9px;
+}
+
+.plan-block-head h3 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 950;
+  line-height: 1.08;
+}
+
+.plan-item-list,
+.plan-mini-list,
+.plan-timeline {
+  display: grid;
+  gap: 7px;
+}
+
+.plan-grid {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.plan-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+  border: 1px solid var(--inner-line);
+  border-radius: var(--radius);
+  background: var(--inner-bg);
+  padding: 9px;
+}
+
+.plan-item-icon,
+.plan-mini-item > span {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.plan-item-icon {
+  width: 34px;
+  height: 34px;
+}
+
+.plan-item-icon svg,
+.plan-mini-item svg {
+  width: 21px;
+  height: 21px;
+}
+
+.plan-item strong,
+.plan-mini-item strong,
+.phase-row strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 920;
+  line-height: 1.14;
+}
+
+.plan-item em {
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  padding: 3px 7px;
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.plan-item p {
+  margin: 4px 0 7px;
+  color: var(--muted);
+  font-size: 0.77rem;
+  line-height: 1.3;
+}
+
+.plan-mini-item {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--inner-line);
+  border-radius: var(--radius);
+  background: var(--inner-bg);
+  padding: 8px;
+}
+
+.plan-mini-item > span {
+  width: 30px;
+  height: 30px;
+}
+
+.plan-mini-item small,
+.phase-row small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+
+.plan-timeline-drawer {
+  margin-top: 10px;
+}
+
+.phase-row {
+  align-items: start;
+  border: 1px solid var(--inner-line);
+  border-radius: var(--radius);
+  background: var(--inner-bg);
+  padding: 9px;
+}
+
+.phase-row.active {
+  border-color: var(--line-strong);
+  background: var(--accent-soft);
+}
+
+.phase-row span {
+  flex: 0 0 82px;
+  color: var(--accent-strong);
+  font-size: 0.64rem;
+  font-weight: 900;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.phase-row strong,
+.phase-row small {
+  min-width: 0;
+}
+
 .tight-section {
   margin-bottom: 11px;
   padding: 12px;
@@ -1066,10 +1268,12 @@ body.is-home .bottom-nav {
 .brand-mark path,
 .home-mark path,
 .home-button path,
-.launcher-icon path,
-.weather-day path,
-.gear-tile-icon path,
-.gear-back path {
+  .launcher-icon path,
+  .weather-day path,
+  .gear-tile-icon path,
+  .gear-back path,
+  .plan-item-icon path,
+  .plan-mini-item path {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -1108,8 +1312,13 @@ button:active {
 
   .launcher-grid,
   .gear-list,
+  .plan-grid,
   .system-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .plan-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .gear-hub {

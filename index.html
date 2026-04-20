@@ -78,23 +78,37 @@
           <section class="view" id="plan-view" data-view="plan" aria-labelledby="plan-heading">
             <h2 class="visually-hidden" id="plan-heading">Plan</h2>
 
-            <details class="drawer">
-              <summary>Current phase</summary>
-              <div class="focus-panel">
-                <p class="eyebrow" id="plan-phase-window"></p>
-                <h3 id="plan-phase-title"></h3>
-                <p id="plan-main-recommendation"></p>
+            <section class="plan-phase-card" id="plan-phase-card"></section>
+
+            <section class="plan-block" aria-labelledby="plan-priority-heading">
+              <div class="plan-block-head">
+                <span class="label">This phase</span>
+                <h3 id="plan-priority-heading">What matters now</h3>
               </div>
-            </details>
+              <div class="plan-item-list" id="plan-priority-list"></div>
+            </section>
 
-            <details class="drawer">
-              <summary>What matters now</summary>
-              <div class="support-list" id="plan-support-list"></div>
-            </details>
+            <div class="plan-grid">
+              <section class="plan-block compact" aria-labelledby="plan-trigger-heading">
+                <div class="plan-block-head">
+                  <span class="label">Watch</span>
+                  <h3 id="plan-trigger-heading">Triggers</h3>
+                </div>
+                <div class="plan-mini-list" id="plan-trigger-list"></div>
+              </section>
 
-            <details class="drawer">
-              <summary>Look ahead</summary>
-              <div class="lookahead-list" id="plan-lookahead-list"></div>
+              <section class="plan-block compact" aria-labelledby="plan-buy-heading">
+                <div class="plan-block-head">
+                  <span class="label">Stage</span>
+                  <h3 id="plan-buy-heading">Buy ahead</h3>
+                </div>
+                <div class="plan-mini-list" id="plan-buy-list"></div>
+              </section>
+            </div>
+
+            <details class="drawer plan-timeline-drawer">
+              <summary>Seasonal progression</summary>
+              <div class="plan-timeline" id="plan-timeline-list"></div>
             </details>
           </section>
 
