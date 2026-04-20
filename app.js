@@ -133,13 +133,13 @@ function showView(view, options = {}) {
 }
 
 function renderHome() {
-  const { profile, systems } = state.data;
+  const { profile, zones } = state.data;
   const season = profile.currentSeason;
   const location = profile.weatherAwareness.location?.label || profile.property.region;
   text("#home-window", `${season.label} / ${location} / ${formatDate(season.asOf)}`);
   text("#launcher-plan-note", season.label);
   text("#launcher-gear-note", "Products / equipment");
-  text("#launcher-property-note", `${systems.systems.length} systems`);
+  text("#launcher-property-note", `${formatNumber(zones.propertySummary?.totalLawnAreaSqFt || profile.property.totalLawnAreaSqFt)} sq ft`);
   renderWeatherPanel();
 }
 
@@ -252,12 +252,25 @@ function renderProductsGear() {
 }
 
 function renderEquipmentGear() {
-  const { equipment, settings } = state.data;
+  const { equipment, settings, inventory } = state.data;
   const settingMap = new Map(settings.settings.map((setting) => [setting.id, setting]));
+  const inventoryMap = new Map(inventory.items.map((item) => [item.id, item]));
+  const equipmentMap = new Map(equipment.equipment.map((item) => [item.id, item]));
   const equipmentItems = equipment.equipment.map((item) => {
     const linkedSettings = (item.knownSettings || []).map((id) => settingMap.get(id)).filter(Boolean);
-    const settingText = linkedSettings.map((setting) => `${setting.label}: ${setting.value}`).join(" / ");
-    return denseItem(item.name, item.status, settingText || item.operatingNotes);
+    const dedicatedProducts = (item.reservedForInventoryIds || [])
+      .map((id) => inventoryMap.get(id)?.name)
+      .filter(Boolean);
+    const childTools = (item.childEquipmentIds || [])
+      .map((id) => equipmentMap.get(id)?.name)
+      .filter(Boolean);
+    const relationshipText = [
+      dedicatedProducts.length ? `Dedicated to ${dedicatedProducts.join(" / ")}` : "",
+      childTools.length ? `Parent for ${childTools.join(" / ")}` : "",
+      item.parentEquipmentId ? `Connects to ${equipmentMap.get(item.parentEquipmentId)?.name || item.parentEquipmentId}` : "",
+      linkedSettings.map((setting) => `${setting.label}: ${setting.value}`).join(" / ")
+    ].filter(Boolean).join(" / ");
+    return denseItem(item.name, equipmentMeta(item), relationshipText || item.operatingNotes);
   }).join("");
   document.querySelector("#gear-focus").innerHTML = `
     <div class="gear-head">
@@ -309,15 +322,15 @@ function gearCard(item) {
       <header>
         <div>
           <strong>${escapeHtml(item.name)}</strong>
-          <span>${escapeHtml(item.unitSize || item.coverage || item.category)}</span>
+          <span>${escapeHtml(productSubtitle(item))}</span>
         </div>
         <em>${escapeHtml(item.preferredStatus || item.stockStatus)}</em>
       </header>
       <p>${escapeHtml(item.typicalUse || item.useTiming)}</p>
       <div class="gear-meta">
-        <span><b>Last</b>${formatDate(item.lastPurchased)}</span>
-        <span><b>Timing</b>${escapeHtml(item.useTiming)}</span>
-        <span><b>Setting</b>${escapeHtml(item.spreaderSetting || "Not recorded")}</span>
+        <span><b>Coverage</b>${escapeHtml(item.coverage || item.unitSize || "Reference")}</span>
+        <span><b>Tool</b>${escapeHtml(productToolLabel(item))}</span>
+        <span><b>Timing</b>${escapeHtml(item.useTiming || "As needed")}</span>
       </div>
       <small>${escapeHtml(item.shortNote || item.notes)}</small>
     </article>
@@ -353,17 +366,15 @@ function renderProperty() {
           </div>
           <em>${escapeHtml(system.status)}</em>
         </header>
-        <p>${escapeHtml(system.notes[0] || "")}</p>
+        <p>${escapeHtml(concise((system.notes || []).join(" "), 170))}</p>
         <div class="pill-row">
           ${linkedTasks.slice(0, 3).map((task) => `<span>${escapeHtml(task.title)}</span>`).join("")}
         </div>
       </article>
     `;
-  }).join("");
+  }).join("") + irrigationZoneSummary(systems.irrigation);
 
-  document.querySelector("#property-zones").innerHTML = zones.zones
-    .map((zone) => denseItem(zone.name, zone.condition, zone.strategy))
-    .join("");
+  document.querySelector("#property-zones").innerHTML = propertyReferenceItems(zones).join("");
 
   document.querySelector("#property-lessons").innerHTML = settings.lessonsLearned
     .map((lesson) => `<li>${escapeHtml(lesson)}</li>`)
@@ -382,12 +393,79 @@ function gearItems(categoryId) {
 
 function gearSections() {
   const { inventory, equipment, purchases, settings } = state.data;
+  const usualProducts = inventory.items.filter((item) => item.referenceRole !== "historical");
   return [
-    { id: "products", label: "Products", note: `${inventory.items.length} usual buys` },
+    { id: "products", label: "Products", note: `${usualProducts.length} usual buys` },
     { id: "equipment", label: "Equipment", note: `${equipment.equipment.length} tools` },
     { id: "settings", label: "Settings", note: `${settings.settings.length} known` },
     { id: "history", label: "Purchase History", note: `${purchases.purchases.length} orders` }
   ];
+}
+
+function productSubtitle(item) {
+  return [item.productCode ? `Code ${item.productCode}` : "", item.unitSize || item.coverage || item.category]
+    .filter(Boolean)
+    .join(" / ");
+}
+
+function productToolLabel(item) {
+  const equipment = state.data.equipment.equipment;
+  const names = (item.relatedEquipmentIds || [])
+    .map((id) => equipment.find((tool) => tool.id === id)?.name)
+    .filter(Boolean);
+  if (names.length) return names.join(" / ");
+  return item.spreaderSetting === "Not applicable." ? "No spreader" : "Label guidance";
+}
+
+function equipmentMeta(item) {
+  return [
+    item.status,
+    item.model ? `Model ${item.model}` : "",
+    item.purchased ? `Purchased ${item.purchased}` : ""
+  ].filter(Boolean).join(" / ");
+}
+
+function irrigationZoneSummary(irrigation) {
+  if (!irrigation) return "";
+  const activeZones = irrigation.zones.filter((zone) => zone.status === "active");
+  const offZones = irrigation.zones.filter((zone) => zone.status !== "active");
+  return `
+    <article class="property-card">
+      <header>
+        <div>
+          <span>schedule</span>
+          <strong>${escapeHtml(irrigation.controller.name)}</strong>
+        </div>
+        <em>${escapeHtml(`${irrigation.activeRuntimePerWateringDayMinutes} min/day`)}</em>
+      </header>
+      <p>${escapeHtml(`${irrigation.wateringDays.join(" / ")} at ${irrigation.controller.startTime}. ${activeZones.length} active zones, ${offZones.length} intentionally off. No rain sensor.`)}</p>
+      <div class="pill-row">
+        ${activeZones.map((zone) => `<span>Z${zone.number} ${escapeHtml(zone.name)} ${zone.runtimeMinutes}m</span>`).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function propertyReferenceItems(zones) {
+  const items = [];
+  if (zones.propertySummary) {
+    items.push(denseItem(
+      "Lawn area math",
+      `${formatNumber(zones.propertySummary.totalLawnAreaSqFt)} sq ft total`,
+      zones.propertySummary.coverageNotes.join(" ")
+    ));
+  }
+  items.push(...zones.zones.map((zone) => denseItem(
+    zone.name,
+    `${formatNumber(zone.areaSqFt)} sq ft${zone.irrigationZoneRefs?.length ? ` / Irrigation Z${zone.irrigationZoneRefs.join(", Z")}` : ""}`,
+    zone.strategy
+  )));
+  items.push(...(zones.landscape || []).map((group) => denseItem(
+    group.label,
+    group.location,
+    `${group.items.join(" / ")}${group.certaintyNotes ? ` (${group.certaintyNotes.join(" ")})` : ""}`
+  )));
+  return items;
 }
 
 function denseItem(title, meta, body) {
@@ -482,6 +560,10 @@ function formatDate(value) {
 function formatTemperature(value) {
   if (value === null || value === undefined || value === "") return "--";
   return `${Math.round(Number(value))}°`;
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
 function escapeHtml(value) {

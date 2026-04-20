@@ -1,32 +1,188 @@
 {
+  "equipmentModel": {
+    "purpose": "Reference for owned gear, product relationships, and operating defaults. This is not a warranty or serial-number record.",
+    "relationshipTypes": [
+      "application tool",
+      "parent power unit",
+      "dedicated sprayer",
+      "maintenance reference"
+    ]
+  },
   "equipment": [
     {
-      "id": "mower",
-      "name": "Mower",
-      "category": "cutting",
+      "id": "honda-hrn216vka",
+      "name": "Honda HRN216VKA",
+      "category": "mower",
       "status": "active",
+      "model": "HRN216VKA",
+      "power": "gas",
+      "purchased": "early 2022",
       "knownSettings": ["mower-height-default"],
       "maintenance": [
         "Sharpen blade before spring growth or whenever cut quality declines.",
         "Keep tall fescue on the higher side.",
         "Do not remove more than about one-third of the blade at once."
       ],
-      "operatingNotes": "Mulch clippings unless they are clumpy, diseased, or smothering the turf."
+      "operatingNotes": "Self-propelled walk-behind mower. Mulch clippings unless they are clumpy, diseased, or smothering the turf."
     },
     {
-      "id": "broadcast-spreader",
-      "name": "Broadcast spreader",
+      "id": "scotts-elite-spreader",
+      "name": "Scotts Elite Spreader",
       "category": "application",
-      "status": "settings incomplete",
+      "status": "primary granular applicator",
+      "model": "Elite",
+      "purchased": "2022",
       "knownSettings": ["spreader-general-default"],
+      "relatedProductCategories": ["pre-emergent", "fertilizer", "seed", "soil-topdressing"],
       "maintenance": [
         "Clean after fertilizer or herbicide use.",
         "Record exact setting, product, rate, and result after each application."
       ],
-      "operatingNotes": "Use label guidance first. Start conservatively if the exact model setting is unknown."
+      "operatingNotes": "Primary tool for granular lawn products."
     },
     {
-      "id": "rain-gauge",
+      "id": "milwaukee-m18-fuel-blower",
+      "name": "Milwaukee M18 FUEL Blower",
+      "category": "cleanup",
+      "status": "active",
+      "model": "2724-20",
+      "purchased": "2023",
+      "knownSettings": [],
+      "maintenance": [],
+      "operatingNotes": "Battery blower for lawn cleanup, hard surfaces, leaves, and light debris."
+    },
+    {
+      "id": "milwaukee-m12-fuel-hatchet",
+      "name": "Milwaukee M12 FUEL HATCHET 6-inch Pruning Saw",
+      "category": "pruning",
+      "status": "active",
+      "model": "2527-20",
+      "purchased": "2023",
+      "knownSettings": [],
+      "maintenance": [
+        "Keep chain sharp and bar oil available."
+      ],
+      "operatingNotes": "Small pruning saw for limbs and property cleanup."
+    },
+    {
+      "id": "milwaukee-m18-power-head",
+      "name": "Milwaukee M18 FUEL Power Head",
+      "category": "power head",
+      "status": "parent unit",
+      "model": "2825-20",
+      "purchased": "2022",
+      "knownSettings": [],
+      "childEquipmentIds": [
+        "milwaukee-string-trimmer-attachment",
+        "milwaukee-hedge-trimmer-attachment"
+      ],
+      "maintenance": [],
+      "operatingNotes": "Parent unit for Milwaukee interchangeable outdoor attachments."
+    },
+    {
+      "id": "milwaukee-string-trimmer-attachment",
+      "name": "Milwaukee String Trimmer Attachment",
+      "category": "trimming",
+      "status": "attachment",
+      "model": "49-16-2717",
+      "purchased": "unknown",
+      "parentEquipmentId": "milwaukee-m18-power-head",
+      "knownSettings": [],
+      "maintenance": [],
+      "operatingNotes": "Connects to the Milwaukee M18 FUEL Power Head."
+    },
+    {
+      "id": "milwaukee-hedge-trimmer-attachment",
+      "name": "Milwaukee Articulating Hedge Trimmer Attachment",
+      "category": "hedge trimming",
+      "status": "attachment",
+      "model": "49-16-2719",
+      "purchased": "unknown",
+      "parentEquipmentId": "milwaukee-m18-power-head",
+      "knownSettings": [],
+      "maintenance": [],
+      "operatingNotes": "Connects to the Milwaukee M18 FUEL Power Head."
+    },
+    {
+      "id": "westinghouse-wpx3400",
+      "name": "Westinghouse WPX3400 Pressure Washer",
+      "category": "cleaning",
+      "status": "active",
+      "model": "WPX3400",
+      "purchased": "2026",
+      "knownSettings": [],
+      "maintenance": [],
+      "operatingNotes": "3400 PSI / 2.6 GPM pressure washer for outdoor cleaning."
+    },
+    {
+      "id": "gorilla-hose-reel-cart",
+      "name": "Gorilla Hose Reel Cart",
+      "category": "water / hose",
+      "status": "active",
+      "model": "GRS-175H",
+      "purchased": "2026",
+      "knownSettings": [],
+      "maintenance": [],
+      "operatingNotes": "175 ft capacity hose reel cart."
+    },
+    {
+      "id": "ortho-dial-n-spray",
+      "name": "Ortho Dial N Spray Hose-End Sprayer",
+      "category": "application",
+      "status": "hose-end applicator",
+      "model": "LB15279",
+      "purchased": "2025",
+      "knownSettings": ["hose-end-application-default"],
+      "relatedProductCategories": ["weed-control", "pest-control"],
+      "maintenance": [
+        "Rinse after use and avoid mixing incompatible products."
+      ],
+      "operatingNotes": "Used for hose-end / liquid application scenarios."
+    },
+    {
+      "id": "hdx-pump-sprayer-roundup-weed-grass",
+      "name": "HDX 1-Gallon Pump Sprayer #1",
+      "category": "application",
+      "status": "dedicated sprayer",
+      "model": "1-gallon",
+      "purchased": "unknown",
+      "knownSettings": ["sprayer-non-selective-dedication"],
+      "reservedForInventoryIds": ["roundup-weed-grass-killer"],
+      "maintenance": [
+        "Keep dedicated to non-selective weed killer."
+      ],
+      "operatingNotes": "Reserved for Roundup Weed & Grass Killer."
+    },
+    {
+      "id": "hdx-pump-sprayer-roundup-lawns",
+      "name": "HDX 1-Gallon Pump Sprayer #2",
+      "category": "application",
+      "status": "dedicated sprayer",
+      "model": "1-gallon",
+      "purchased": "unknown",
+      "knownSettings": ["sprayer-grass-safe-dedication"],
+      "reservedForInventoryIds": ["roundup-for-lawns"],
+      "maintenance": [
+        "Keep dedicated to grass-safe lawn weed killer."
+      ],
+      "operatingNotes": "Reserved for Roundup For Lawns."
+    },
+    {
+      "id": "hdx-pump-sprayer-home-defense",
+      "name": "HDX 1-Gallon Pump Sprayer #3",
+      "category": "application",
+      "status": "dedicated sprayer",
+      "model": "1-gallon",
+      "purchased": "unknown",
+      "knownSettings": ["sprayer-bug-spray-dedication"],
+      "reservedForInventoryIds": ["ortho-home-defense"],
+      "maintenance": [
+        "Keep dedicated to bug spray."
+      ],
+      "operatingNotes": "Reserved for Ortho Home Defense."
+    },
+    {
+      "id": "rain-gauge-catch-can",
       "name": "Rain gauge / catch-can test",
       "category": "measurement",
       "status": "recommended",

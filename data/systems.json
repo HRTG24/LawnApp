@@ -1,14 +1,103 @@
 {
+  "irrigation": {
+    "controller": {
+      "name": "Rain Bird ESP Modular irrigation controller",
+      "series": "ESP-M",
+      "modulesInstalled": 3,
+      "installedApprox": "around 2005",
+      "startTime": "6:00 AM",
+      "rainSensor": false
+    },
+    "wateringDays": ["Sunday", "Tuesday", "Thursday"],
+    "activeRuntimePerWateringDayMinutes": 84,
+    "notes": [
+      "No rain sensor is installed.",
+      "Use weather and soil moisture to decide whether the schedule should actually run."
+    ],
+    "zones": [
+      {
+        "number": 1,
+        "name": "Front Side",
+        "area": "Both west and east sides of house",
+        "runtimeMinutes": 20,
+        "status": "active"
+      },
+      {
+        "number": 2,
+        "name": "Front Main",
+        "area": "Main front lawn",
+        "runtimeMinutes": 20,
+        "status": "active"
+      },
+      {
+        "number": 3,
+        "name": "Front Drip",
+        "area": "Front drip line",
+        "runtimeMinutes": 7,
+        "status": "active"
+      },
+      {
+        "number": 4,
+        "name": "Backyard Main",
+        "area": "Main backyard turf",
+        "runtimeMinutes": 20,
+        "status": "active"
+      },
+      {
+        "number": 5,
+        "name": "West Side Back",
+        "area": "West side of house in back area",
+        "runtimeMinutes": 15,
+        "status": "active"
+      },
+      {
+        "number": 6,
+        "name": "Rock Fountain",
+        "area": "Rock fountain",
+        "runtimeMinutes": 2,
+        "status": "active"
+      },
+      {
+        "number": 7,
+        "name": "East Drip",
+        "area": "East drip line",
+        "runtimeMinutes": 0,
+        "status": "intentionally off long-term",
+        "notes": "Trees are mature now."
+      },
+      {
+        "number": 8,
+        "name": "West Drip",
+        "area": "West drip line",
+        "runtimeMinutes": 0,
+        "status": "intentionally off long-term",
+        "notes": "Trees are mature now."
+      }
+    ]
+  },
   "systems": [
     {
-      "id": "irrigation-system",
-      "name": "Irrigation system",
+      "id": "irrigation-controller",
+      "name": "Irrigation controller",
       "category": "water",
-      "status": "details unknown",
+      "status": "Rain Bird ESP-M / active",
       "seasonalTasks": ["irrigation-startup-backflow", "irrigation-coverage-check"],
       "notes": [
-        "Coverage and zone layout should be verified before relying on summer irrigation.",
-        "Use soil moisture and weather, not calendar habit alone, to decide when to water."
+        "Rain Bird ESP Modular controller, ESP-M series, 3 modules installed, approximate install around 2005.",
+        "Start time is 6:00 AM on Sunday, Tuesday, and Thursday.",
+        "No rain sensor is installed."
+      ]
+    },
+    {
+      "id": "irrigation-zones",
+      "name": "Irrigation zones",
+      "category": "water",
+      "status": "6 active / 2 intentionally off",
+      "seasonalTasks": ["irrigation-coverage-check"],
+      "notes": [
+        "Active runtime per watering day is 84 minutes.",
+        "Zones 7 and 8 are intentionally off long-term because trees are mature.",
+        "Coverage should be checked before fertilizer or heat-stress decisions rely on irrigation."
       ]
     },
     {

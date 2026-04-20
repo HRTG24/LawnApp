@@ -20,11 +20,11 @@ The operating goal is a healthy, low-effort tall fescue lawn and outdoor system 
 - `data/profile.json` - property-safe profile, current season, current phase, and weather-aware placeholders.
 - `data/seasonal-plan.json` - phase-based seasonal plan with lead-time thinking.
 - `data/tasks.json` - current, next, recurring, dependency, and buy-ahead tasks.
-- `data/inventory.json` - products/reference inventory with stock-verification notes.
+- `data/inventory.json` - reference-oriented usual products and product/equipment relationships.
 - `data/purchase-history.json` - sanitized purchase history with no private receipt details.
 - `data/equipment.json` - mower, spreader, measurement tools, and operating notes.
-- `data/systems.json` - irrigation, backflow, mulch beds, and other property systems.
-- `data/zones.json` - property/lawn areas with strategies and recommendations.
+- `data/systems.json` - irrigation controller, watering schedule, irrigation zones, backflow, mulch beds, and other property systems.
+- `data/zones.json` - lawn area math, property/lawn areas, strategies, and landscape reference.
 - `data/known-settings.json` - known settings, lessons learned, and supporting sources.
 - `data/ui-config.json` - navigation and home card configuration.
 - `.nojekyll` - tells GitHub Pages to serve the static files directly.

@@ -12,7 +12,8 @@
           "size": "13.58 lb",
           "coverage": "5,000 sq ft",
           "quantity": 2,
-          "category": "pre-emergent"
+          "category": "pre-emergent",
+          "note": "Receipt item maps to current Halts with Lawn Food reference for planning."
         },
         {
           "inventoryId": "scotts-weed-feed5",

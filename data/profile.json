@@ -7,7 +7,12 @@
   "property": {
     "region": "Valley Center, KS",
     "privacyNote": "Published UI intentionally avoids exact address, phone, payment, or private account details.",
-    "operatingGoal": "Healthy, low-effort outdoor systems with good timing and sane decisions."
+    "operatingGoal": "Healthy, low-effort outdoor systems with good timing and sane decisions.",
+    "totalLawnAreaSqFt": 8225,
+    "coverageMath": [
+      "A 5,000 sq ft lawn product covers about 61% of the full lawn.",
+      "Two 5,000 sq ft units are typically needed for a full-property application."
+    ]
   },
   "lawn": {
     "grassType": "Tall fescue",
@@ -37,7 +42,7 @@
       "Start thinking ahead to May heat, disease pressure, and irrigation coverage."
     ],
     "buyPrepFocus": [
-      "Verify whether any 2025 pre-emergent or weed-control products remain usable.",
+      "Use the 8,225 sq ft lawn area when deciding whether to buy one or two 5,000 sq ft products.",
       "Record spreader settings when any product is applied.",
       "Keep fall seed and fertilizer planning in view, but do not rush large spring seeding."
     ]

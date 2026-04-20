@@ -1,48 +1,133 @@
 {
+  "propertySummary": {
+    "totalLawnAreaSqFt": 8225,
+    "areasCount": 4,
+    "coverageNotes": [
+      "A 5,000 sq ft product covers about 61% of the full lawn.",
+      "Two 5,000 sq ft units are typically needed for a full-property application."
+    ]
+  },
   "zones": [
     {
-      "id": "front-visible",
-      "name": "Front / high visibility",
-      "category": "lawn",
-      "condition": "Priority presentation area",
-      "strategy": "Keep mowing clean, monitor weeds, and avoid cosmetic overreaction during heat.",
+      "id": "front-main-lawn",
+      "name": "Front Main Lawn",
+      "category": "lawn area",
+      "areaSqFt": 2300,
+      "condition": "2,300 sq ft",
+      "strategy": "Main front lawn area. Use this as the primary front-yard turf reference.",
+      "irrigationZoneRefs": [2],
       "recommendations": [
-        "Use this zone for visible turf quality decisions.",
-        "Mark thin spots for fall seed instead of pushing spring fixes."
+        "Prioritize clean mowing and visible turf quality.",
+        "Plan product coverage against the 8,225 sq ft full-lawn total unless intentionally spot-treating."
       ]
     },
     {
-      "id": "dry-edges",
-      "name": "Dry / hot edges",
-      "category": "lawn",
-      "condition": "Likely to show wilt or heat stress first",
-      "strategy": "Check irrigation coverage and soil moisture before fertilizer or seed decisions.",
+      "id": "front-side-lawn",
+      "name": "Front Side Lawn",
+      "category": "lawn area",
+      "areaSqFt": 1325,
+      "condition": "1,325 sq ft",
+      "strategy": "Side-front turf on both west and east sides of house.",
+      "irrigationZoneRefs": [1],
       "recommendations": [
-        "Watch for footprints that do not rebound.",
-        "Use this zone to calibrate watering decisions."
+        "Watch edge stress and sprinkler coverage differences.",
+        "Use Zone 1 runtime context when diagnosing dryness."
       ]
     },
     {
-      "id": "thin-repair-areas",
-      "name": "Thin / repair areas",
-      "category": "lawn",
-      "condition": "Potential fall seed targets",
-      "strategy": "Track areas for September seed, aeration, soil correction, or watering changes.",
+      "id": "back-main-lawn",
+      "name": "Back Main Lawn",
+      "category": "lawn area",
+      "areaSqFt": 2700,
+      "condition": "2,700 sq ft",
+      "strategy": "Main backyard turf area.",
+      "irrigationZoneRefs": [4],
       "recommendations": [
-        "Avoid large spring seeding unless there is no alternative.",
-        "Pair fall seed plans with watering and soil prep."
+        "Check coverage before summer fertilizer decisions.",
+        "Use this area as the main backyard turf reference."
       ]
     },
     {
-      "id": "shade-traffic",
-      "name": "Shade / traffic",
-      "category": "lawn",
-      "condition": "May behave differently from open turf",
-      "strategy": "Reduce traffic when wet and decide whether turf is realistic in the area.",
+      "id": "back-small-lawn",
+      "name": "Back Small Lawn",
+      "category": "lawn area",
+      "areaSqFt": 1900,
+      "condition": "1,900 sq ft",
+      "strategy": "Smaller backyard turf area.",
+      "irrigationZoneRefs": [5],
       "recommendations": [
-        "Do not treat shade failure as a simple fertilizer problem.",
-        "Consider non-turf solutions if grass repeatedly fails."
+        "Watch west-side heat and watering behavior.",
+        "Consider this separately from the larger back main lawn for repair decisions."
       ]
     }
+  ],
+  "landscape": [
+    {
+      "id": "front-yard-trees",
+      "label": "Front yard trees",
+      "location": "front yard",
+      "items": [
+        "Chinese Pistache",
+        "Autumn Blaze Maple",
+        "Japanese Maple"
+      ]
+    },
+    {
+      "id": "front-yard-shrubs",
+      "label": "Front yard shrubs",
+      "location": "front yard",
+      "items": [
+        "Magic Carpet Spirea",
+        "Yew Shrubs"
+      ]
+    },
+    {
+      "id": "backyard-trees",
+      "label": "Backyard trees",
+      "location": "backyard",
+      "items": [
+        "Maple Tree",
+        "Blue Spruce",
+        "Eastern White Pine",
+        "Black Hills Spruce",
+        "River Birch",
+        "Lacebark Elm (2)",
+        "Locust",
+        "Hornbeam",
+        "Pear"
+      ]
+    },
+    {
+      "id": "backyard-shrubs",
+      "label": "Backyard shrubs / bushes",
+      "location": "backyard",
+      "items": [
+        "Holly Shrub",
+        "Blue Chip Juniper",
+        "Juniper \"Kettle\" / likely Keteleeri-type Juniper",
+        "Barberry Shrubs",
+        "Pyracantha",
+        "Euonymus",
+        "Honeysuckle"
+      ],
+      "certaintyNotes": [
+        "Juniper \"Kettle\" is a soft identification and should not be treated as fully certain."
+      ]
+    },
+    {
+      "id": "backyard-perennials-grasses",
+      "label": "Backyard flowers / perennials / grasses",
+      "location": "backyard",
+      "items": [
+        "Daylilies",
+        "Asiatic Lilies",
+        "Feather Reed Grass",
+        "Fountain Grass"
+      ]
+    }
+  ],
+  "notes": [
+    "Some plant and installation details are approximate.",
+    "Exact counts are not important for plant references right now."
   ]
 }

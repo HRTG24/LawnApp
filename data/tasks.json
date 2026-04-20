@@ -45,7 +45,7 @@
     },
     {
       "id": "verify-pre-emergent-inventory",
-      "title": "Verify pre-emergent inventory",
+      "title": "Plan pre-emergent purchase",
       "category": "prep / buying",
       "phaseId": "spring-wake",
       "status": "buy-soon",
@@ -56,20 +56,20 @@
       "dependencies": [],
       "inventoryRefs": ["scotts-halts-crabgrass-preventer"],
       "weatherRules": [],
-      "notes": "Purchase history shows two bags bought March 18, 2025; current remaining stock should be verified before buying more."
+      "notes": "Use the 8,225 sq ft lawn total for purchase planning. A 5,000 sq ft unit covers about 61% of the lawn, so two units are typically needed for full-property coverage."
     },
     {
       "id": "light-may-fertilizer-decision",
-      "title": "Decide on light May fertilizer",
+      "title": "Decide whether spring feeding is worth it",
       "category": "lawn",
       "phaseId": "late-spring-transition",
       "status": "next",
       "priority": "medium",
       "timing": "May only if lawn is actively growing and summer watering is realistic",
-      "leadTime": "Verify fertilizer inventory and irrigation ability before applying",
+      "leadTime": "Confirm irrigation ability and whether the product fits the season before applying",
       "recurrence": "Conditional annual",
       "dependencies": ["irrigation-coverage-check"],
-      "inventoryRefs": ["scotts-weed-feed5"],
+      "inventoryRefs": ["scotts-winterguard-fall-weed-feed"],
       "weatherRules": ["Avoid pushing growth before hot/dry periods.", "Follow product label for temperature, rain, and watering directions."],
       "notes": "Heavy early spring nitrogen can increase mowing, weeds, and disease pressure."
     },
@@ -155,11 +155,12 @@
       "status": "upcoming",
       "priority": "high",
       "timing": "November",
-      "leadTime": "Buy winterizer/fall fertilizer before the November window",
+      "leadTime": "Buy fall fertilizer before the November window; two 5,000 sq ft units are the full-property planning assumption",
       "recurrence": "Annual",
       "dependencies": [],
       "weatherRules": ["Water in if rain does not.", "Keep leaves from matting turf."],
-      "notes": "This is usually higher value for tall fescue than pushing summer color."
+      "inventoryRefs": ["scotts-winterguard-fall-weed-feed"],
+      "notes": "This is usually higher value for tall fescue than pushing summer color. Treat Scotts WinterGuard product code 50240 as a 5,000 sq ft working product."
     }
   ]
 }

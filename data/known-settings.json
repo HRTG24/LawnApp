@@ -10,11 +10,59 @@
     },
     {
       "id": "spreader-general-default",
-      "label": "Spreader application default",
+      "label": "Scotts Elite spreader default",
       "category": "spreader",
       "value": "Follow product label; record actual setting after use",
       "confidence": "needs property-specific data",
       "notes": "Future Codex updates should add exact product/model settings here when known."
+    },
+    {
+      "id": "hose-end-application-default",
+      "label": "Hose-end liquid application default",
+      "category": "sprayer",
+      "value": "Use Ortho Dial N Spray for hose-end / liquid application scenarios",
+      "confidence": "known equipment relationship",
+      "notes": "Follow product-specific label rates and keep incompatible products separate."
+    },
+    {
+      "id": "sprayer-non-selective-dedication",
+      "label": "Pump Sprayer #1",
+      "category": "sprayer dedication",
+      "value": "Reserved for Roundup Weed & Grass Killer",
+      "confidence": "known property rule",
+      "notes": "Non-selective weed killer sprayer. Keep away from grass-safe products."
+    },
+    {
+      "id": "sprayer-grass-safe-dedication",
+      "label": "Pump Sprayer #2",
+      "category": "sprayer dedication",
+      "value": "Reserved for Roundup For Lawns",
+      "confidence": "known property rule",
+      "notes": "Grass-safe weed killer sprayer."
+    },
+    {
+      "id": "sprayer-bug-spray-dedication",
+      "label": "Pump Sprayer #3",
+      "category": "sprayer dedication",
+      "value": "Reserved for Ortho Home Defense",
+      "confidence": "known property rule",
+      "notes": "Bug spray sprayer."
+    },
+    {
+      "id": "full-lawn-coverage-math",
+      "label": "Full lawn coverage math",
+      "category": "property math",
+      "value": "8,225 sq ft total lawn; one 5,000 sq ft product covers about 61%; two units usually cover full-property planning",
+      "confidence": "known property math",
+      "notes": "Use this for planning granular product purchases without turning the app into live stock tracking."
+    },
+    {
+      "id": "irrigation-active-runtime",
+      "label": "Active irrigation runtime",
+      "category": "irrigation",
+      "value": "84 minutes per watering day across active zones",
+      "confidence": "derived from zone runtimes",
+      "notes": "Active watering days are Sunday, Tuesday, and Thursday at 6:00 AM start time."
     },
     {
       "id": "pre-emergent-water-in",
@@ -37,7 +85,8 @@
     "Healthy tall fescue around Valley Center, KS is mostly about timing, restraint, and fall investment.",
     "Avoid heavy early spring fertilizing unless summer irrigation and mowing follow-through are realistic.",
     "Fall seeding and fall fertilizer usually matter more than chasing July color.",
-    "Weather windows matter for product applications: wind, rain, heat, and freeze risk can change the answer."
+    "Weather windows matter for product applications: wind, rain, heat, and freeze risk can change the answer.",
+    "Products are tracked as usual buys and typical use references, not as exact live stock counts."
   ],
   "sources": [
     {
