@@ -559,6 +559,13 @@ body.is-home .views {
   padding: 12px;
 }
 
+#gear-view .gear-focus {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
 .gear-head {
   margin-bottom: 10px;
 }
@@ -580,6 +587,234 @@ body.is-home .views {
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.gear-hub {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gear-tile {
+  display: grid;
+  min-height: 124px;
+  align-content: start;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    var(--panel-gradient),
+    var(--surface);
+  color: var(--ink);
+  padding: 12px;
+  text-align: left;
+  box-shadow: var(--shadow);
+}
+
+.gear-tile-icon,
+.gear-back {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.gear-tile-icon {
+  width: 38px;
+  height: 38px;
+}
+
+.gear-tile-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.gear-tile strong {
+  margin-top: 2px;
+  font-size: 1rem;
+  font-weight: 950;
+  line-height: 1.05;
+}
+
+.gear-tile small,
+.gear-tile em {
+  display: block;
+  font-style: normal;
+  line-height: 1.2;
+}
+
+.gear-tile small {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 780;
+}
+
+.gear-tile em {
+  color: var(--accent-strong);
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.gear-detail-head {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    var(--panel-gradient),
+    var(--surface);
+  padding: 11px;
+  box-shadow: var(--shadow);
+}
+
+.gear-back {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.gear-back svg {
+  width: 22px;
+  height: 22px;
+}
+
+.gear-detail-head h3 {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.gear-detail-head p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.compact-section {
+  margin-top: 10px;
+}
+
+.compact-section h4 {
+  margin: 0 0 7px;
+  color: var(--subtle);
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.compact-list {
+  display: grid;
+  gap: 7px;
+}
+
+.compact-row,
+.history-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    var(--panel-gradient),
+    var(--surface);
+  padding: 10px;
+}
+
+.compact-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.compact-row strong,
+.history-card strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 920;
+  line-height: 1.16;
+}
+
+.compact-row small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.27;
+}
+
+.compact-row em {
+  align-self: start;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  padding: 3px 7px;
+  font-size: 0.6rem;
+  font-style: normal;
+  font-weight: 900;
+  max-width: 118px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mini-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.mini-meta span,
+.history-items span {
+  border: 1px solid var(--inner-line);
+  border-radius: 999px;
+  background: var(--inner-bg);
+  color: var(--subtle);
+  padding: 3px 7px;
+  font-size: 0.63rem;
+  font-weight: 850;
+}
+
+.history-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.history-card header span {
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.history-items {
+  display: grid;
+  gap: 7px;
+}
+
+.history-items div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.history-items strong {
+  overflow: hidden;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .metric-grid {
@@ -832,7 +1067,9 @@ body.is-home .bottom-nav {
 .home-mark path,
 .home-button path,
 .launcher-icon path,
-.weather-day path {
+.weather-day path,
+.gear-tile-icon path,
+.gear-back path {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -873,6 +1110,10 @@ button:active {
   .gear-list,
   .system-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gear-hub {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .launcher-card {

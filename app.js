@@ -20,8 +20,7 @@ const THEME_COLORS = {
 const state = {
   data: null,
   activeView: "home",
-  activeGearSection: "products",
-  activeProductCategory: "pre-emergent",
+  activeGearSection: "hub",
   activePropertySection: "overview"
 };
 
@@ -31,7 +30,6 @@ async function init() {
   try {
     applyTheme(readStoredTheme());
     state.data = await loadData();
-    state.activeProductCategory = state.data.inventory.categories[0]?.id || "pre-emergent";
     hydrateIcons();
     renderApp();
     bindNavigation();
@@ -111,10 +109,21 @@ function bindGearCategories() {
   });
 
   document.querySelector("#gear-focus").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-product-category]");
-    if (!button) return;
-    state.activeProductCategory = button.dataset.productCategory;
-    renderGear();
+    const sectionButton = event.target.closest("[data-gear-section]");
+    if (sectionButton) {
+      state.activeGearSection = sectionButton.dataset.gearSection;
+      renderGearCategories();
+      renderGear();
+      return;
+    }
+
+    const backButton = event.target.closest("[data-gear-back]");
+    if (backButton) {
+      state.activeGearSection = "hub";
+      renderGearCategories();
+      renderGear();
+      return;
+    }
   });
 }
 
@@ -129,6 +138,7 @@ function bindPropertyCategories() {
 }
 
 function showView(view, options = {}) {
+  const previousView = state.activeView;
   state.activeView = view;
   document.body.classList.toggle("is-home", view === "home");
   document.querySelectorAll(".view").forEach((section) => {
@@ -139,6 +149,11 @@ function showView(view, options = {}) {
   });
   const navItem = state.data.ui.navigation.find((item) => item.id === view);
   text("#view-title", navItem ? navItem.label : "Outdoor Ops");
+  if (view === "gear" && previousView !== "gear") {
+    state.activeGearSection = "hub";
+    renderGearCategories();
+    renderGear();
+  }
   if (options.focus !== false) {
     document.querySelector("#main").focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -207,7 +222,14 @@ function renderPlan() {
 }
 
 function renderGearCategories() {
-  document.querySelector("#gear-category-strip").innerHTML = gearSections().map((category) => {
+  const strip = document.querySelector("#gear-category-strip");
+  strip.hidden = state.activeGearSection === "hub";
+  if (state.activeGearSection === "hub") {
+    strip.innerHTML = "";
+    return;
+  }
+
+  strip.innerHTML = gearSections().map((category) => {
     return `
       <button class="${category.id === state.activeGearSection ? "active" : ""}" type="button" data-gear-section="${category.id}">
         <span>${escapeHtml(category.label)}</span>
@@ -227,8 +249,8 @@ function renderPropertyCategories() {
 }
 
 function renderGear() {
-  if (state.activeGearSection === "tools") {
-    renderPowerToolsGear();
+  if (state.activeGearSection === "equipment") {
+    renderEquipmentGear();
     return;
   }
 
@@ -242,141 +264,165 @@ function renderGear() {
     return;
   }
 
-  renderProductsGear();
+  if (state.activeGearSection === "products") {
+    renderProductsGear();
+    return;
+  }
+
+  renderGearHub();
 }
 
-function renderProductsGear() {
-  const { inventory } = state.data;
-  const category = inventory.categories.find((item) => item.id === state.activeProductCategory) || inventory.categories[0];
-  const items = gearItems(category.id);
+function renderGearHub() {
   document.querySelector("#gear-focus").innerHTML = `
-    <div class="gear-head">
-      <span class="label">Product reference</span>
-      <h3>Products</h3>
-      <p>Browse usual buys by category. Purchase history is separate so this stays usable in a store.</p>
-    </div>
-    <div class="product-filter" aria-label="Product categories">
-      ${inventory.categories.map((item) => `
-        <button class="${item.id === category.id ? "active" : ""}" type="button" data-product-category="${item.id}">
-          ${escapeHtml(item.label)}
+    <div class="gear-hub" aria-label="Gear categories">
+      ${gearSections().map((section) => `
+        <button class="gear-tile" type="button" data-gear-section="${section.id}">
+          <span class="gear-tile-icon" aria-hidden="true">${icon(section.icon)}</span>
+          <strong>${escapeHtml(section.label)}</strong>
+          <small>${escapeHtml(section.summary)}</small>
+          <em>${escapeHtml(section.note)}</em>
         </button>
       `).join("")}
-    </div>
-    <div class="gear-head compact">
-      <span class="label">${escapeHtml(category.storeQuestion)}</span>
-      <h3>${escapeHtml(category.label)}</h3>
-      <p>${escapeHtml(category.defaultTiming)}</p>
-    </div>
-    <div class="gear-list">
-      ${items.map(gearCard).join("") || emptyGear(category)}
     </div>
   `;
 }
 
-function renderPowerToolsGear() {
-  const { equipment, settings, inventory } = state.data;
-  const settingMap = new Map(settings.settings.map((setting) => [setting.id, setting]));
-  const inventoryMap = new Map(inventory.items.map((item) => [item.id, item]));
-  const equipmentMap = new Map(equipment.equipment.map((item) => [item.id, item]));
-  const tools = equipment.equipment.filter((item) => item.category !== "application");
-  const groups = [
-    {
-      title: "Cut / trim / prune",
-      items: tools.filter((item) => ["mower", "cleanup", "pruning", "power head", "trimming", "hedge trimming"].includes(item.category))
-    },
-    {
-      title: "Clean / water / measure",
-      items: tools.filter((item) => ["cleaning", "water / hose", "measurement"].includes(item.category))
-    }
-  ].filter((group) => group.items.length);
-  document.querySelector("#gear-focus").innerHTML = `
-    <div class="gear-head">
-      <span class="label">Owned equipment</span>
-      <h3>Power Tools</h3>
-      <p>Mower, Milwaukee system, cleanup tools, and support equipment without the sprayer/applicator workflow mixed in.</p>
+function gearDetailHead(sectionId, eyebrow, title, summary) {
+  const section = gearSections().find((item) => item.id === sectionId);
+  return `
+    <div class="gear-detail-head">
+      <button class="gear-back" type="button" data-gear-back aria-label="Back to Gear categories">
+        ${icon("back")}
+      </button>
+      <div>
+        <span class="label">${escapeHtml(eyebrow)}</span>
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(summary || section?.summary || "")}</p>
+      </div>
     </div>
-    ${groups.map((group) => `
-      <section class="gear-group">
-        <h4>${escapeHtml(group.title)}</h4>
-        <div class="dense-list">
-          ${group.items.map((item) => equipmentCard(item, settingMap, inventoryMap, equipmentMap)).join("")}
-        </div>
-      </section>
-    `).join("")}
+  `;
+}
+
+function renderProductsGear() {
+  const productGroups = groupedProducts();
+  document.querySelector("#gear-focus").innerHTML = `
+    ${gearDetailHead("products", "Usual buys", "Products", "Grouped by how they are used, not by stock counts.")}
+    ${productGroups.map((group) => compactSection(
+      group.title,
+      group.items.map(productRow).join("") || emptyCompactRow("No products recorded", group.title, "")
+    )).join("")}
+  `;
+}
+
+function renderEquipmentGear() {
+  const groups = groupedEquipment();
+  document.querySelector("#gear-focus").innerHTML = `
+    ${gearDetailHead("equipment", "Owned gear", "Equipment", "Core tools grouped by how you would look them up.")}
+    ${groups.map((group) => compactSection(
+      group.title,
+      group.items.map(equipmentRow).join("") || emptyCompactRow("No gear recorded", group.title, "")
+    )).join("")}
   `;
 }
 
 function renderApplicatorsGear() {
-  const { equipment, settings, inventory } = state.data;
-  const settingMap = new Map(settings.settings.map((setting) => [setting.id, setting]));
-  const inventoryMap = new Map(inventory.items.map((item) => [item.id, item]));
-  const equipmentMap = new Map(equipment.equipment.map((item) => [item.id, item]));
-  const applicators = equipment.equipment.filter((item) => item.category === "application");
+  const applicators = state.data.equipment.equipment.filter((item) => item.category === "application");
   document.querySelector("#gear-focus").innerHTML = `
-    <div class="gear-head">
-      <span class="label">Product-to-tool workflow</span>
-      <h3>Applicators</h3>
-      <p>Spreader, hose-end sprayer, and dedicated pump sprayers organized by what they are used for.</p>
-    </div>
-    <div class="dense-list">
-      ${applicators.map((item) => equipmentCard(item, settingMap, inventoryMap, equipmentMap)).join("")}
+    ${gearDetailHead("applicators", "Product-to-tool map", "Applicators", "Spreader and sprayer assignments, kept explicit.")}
+    <div class="compact-list applicator-map">
+      ${applicators.map(applicatorRow).join("")}
     </div>
   `;
 }
 
 function renderPurchaseHistoryGear() {
-  const { purchases } = state.data;
+  const purchases = [...state.data.purchases.purchases].sort((a, b) => new Date(b.date) - new Date(a.date));
   document.querySelector("#gear-focus").innerHTML = `
-    <div class="gear-head">
-      <span class="label">Sanitized receipts</span>
-      <h3>Purchase History</h3>
-      <p>Useful product memory only. Private receipt details stay out of the UI.</p>
-    </div>
-    <div class="dense-list">
-      ${purchases.purchases.map((purchase) => `
-        <div class="dense-item">
-          <strong>${escapeHtml(purchase.vendor)} / ${formatDate(purchase.date)}</strong>
-          <span>No private receipt details</span>
-          <p>${purchase.items.map((item) => `${item.quantity} x ${escapeHtml(item.name)}`).join(" / ")}</p>
-        </div>
-      `).join("")}
+    ${gearDetailHead("history", "Historical reference", "History", "Sanitized purchase memory for planning, not live inventory.")}
+    <div class="compact-list">
+      ${purchases.map(purchaseRow).join("")}
     </div>
   `;
 }
 
-function gearCard(item) {
+function compactSection(title, body) {
   return `
-    <article class="gear-card">
+    <section class="compact-section">
+      <h4>${escapeHtml(title)}</h4>
+      <div class="compact-list">${body}</div>
+    </section>
+  `;
+}
+
+function productRow(item) {
+  const meta = [
+    categoryLabel(item.primaryCategory),
+    item.coverage || item.unitSize,
+    item.lastPurchased ? `Last ${formatDate(item.lastPurchased)}` : "",
+    productToolLabel(item)
+  ].filter(Boolean).slice(0, 4);
+  return compactRow(
+    item.name,
+    item.shortNote || item.typicalUse,
+    meta,
+    item.referenceRole === "historical" ? "history" : item.preferredStatus
+  );
+}
+
+function equipmentRow(item) {
+  const meta = [
+    item.model ? `Model ${item.model}` : "",
+    item.purchased ? `Purchased ${item.purchased}` : "",
+    item.status
+  ].filter(Boolean);
+  return compactRow(item.name, equipmentRelationship(item), meta, item.category);
+}
+
+function applicatorRow(item) {
+  const meta = [
+    item.model ? `Model ${item.model}` : "",
+    item.purchased ? `Purchased ${item.purchased}` : "",
+    item.status
+  ].filter(Boolean);
+  return compactRow(item.name, applicatorAssignment(item), meta, "assigned");
+}
+
+function purchaseRow(purchase) {
+  return `
+    <article class="history-card">
       <header>
-        <div>
-          <strong>${escapeHtml(item.name)}</strong>
-          <span>${escapeHtml(productSubtitle(item))}</span>
-        </div>
-        <em>${escapeHtml(item.preferredStatus || item.stockStatus)}</em>
+        <strong>${escapeHtml(purchase.vendor)}</strong>
+        <span>${formatDate(purchase.date)}</span>
       </header>
-      <p>${escapeHtml(item.typicalUse || item.useTiming)}</p>
-      <div class="gear-meta">
-        <span><b>Coverage</b>${escapeHtml(item.coverage || item.unitSize || "Reference")}</span>
-        <span><b>Tool</b>${escapeHtml(productToolLabel(item))}</span>
-        <span><b>Timing</b>${escapeHtml(item.useTiming || "As needed")}</span>
+      <div class="history-items">
+        ${purchase.items.map((item) => `
+          <div>
+            <strong>${escapeHtml(item.name)}</strong>
+            <span>${escapeHtml([item.quantity ? `${item.quantity}x` : "", item.size, item.coverage].filter(Boolean).join(" / "))}</span>
+          </div>
+        `).join("")}
       </div>
-      <small>${escapeHtml(item.shortNote || item.notes)}</small>
     </article>
   `;
 }
 
-function emptyGear(category) {
+function compactRow(title, support, meta, badge) {
   return `
-    <article class="gear-card empty">
-      <header>
-        <div>
-          <strong>No usual item yet</strong>
-          <span>${escapeHtml(category.label)}</span>
-        </div>
-      </header>
-      <p>Add a preferred or previously purchased item when this category becomes relevant.</p>
+    <article class="compact-row">
+      <div>
+        <strong>${escapeHtml(title)}</strong>
+        <small>${escapeHtml(concise(support || "", 96))}</small>
+      </div>
+      ${badge ? `<em>${escapeHtml(concise(badge, 22))}</em>` : ""}
+      <div class="mini-meta">
+        ${(meta || []).filter(Boolean).map((item) => `<span>${escapeHtml(concise(item, 34))}</span>`).join("")}
+      </div>
     </article>
   `;
+}
+
+function emptyCompactRow(title, meta, support) {
+  return compactRow(title, support, [meta], "");
 }
 
 function renderProperty() {
@@ -398,23 +444,134 @@ function renderProperty() {
   renderPropertyOverview();
 }
 
-function gearItems(categoryId) {
-  return state.data.inventory.items.filter((item) => {
-    return item.primaryCategory === categoryId || (item.secondaryCategories || []).includes(categoryId);
-  });
-}
-
 function gearSections() {
   const { inventory, equipment, purchases } = state.data;
   const usualProducts = inventory.items.filter((item) => item.referenceRole !== "historical");
-  const powerTools = equipment.equipment.filter((item) => item.category !== "application");
+  const equipmentItems = equipment.equipment.filter((item) => item.category !== "application");
   const applicators = equipment.equipment.filter((item) => item.category === "application");
   return [
-    { id: "products", label: "Products", note: `${usualProducts.length} usual buys` },
-    { id: "tools", label: "Power Tools", note: `${powerTools.length} tools` },
-    { id: "applicators", label: "Applicators", note: `${applicators.length} sprayers` },
-    { id: "history", label: "History", note: `${purchases.purchases.length} orders` }
+    {
+      id: "products",
+      label: "Products",
+      note: `${usualProducts.length} usual buys`,
+      summary: "Treatment and pest products",
+      icon: "products"
+    },
+    {
+      id: "equipment",
+      label: "Equipment",
+      note: `${equipmentItems.length} tools`,
+      summary: "Mower, Milwaukee, support gear",
+      icon: "equipment"
+    },
+    {
+      id: "applicators",
+      label: "Applicators",
+      note: `${applicators.length} assigned`,
+      summary: "Spreader and sprayers",
+      icon: "applicators"
+    },
+    {
+      id: "history",
+      label: "History",
+      note: `${purchases.purchases.length} orders`,
+      summary: "Purchase reference",
+      icon: "history"
+    }
   ];
+}
+
+function groupedProducts() {
+  const items = state.data.inventory.items.filter((item) => item.referenceRole !== "historical");
+  const used = new Set();
+  const take = (predicate) => items.filter((item) => {
+    if (used.has(item.id) || !predicate(item)) return false;
+    used.add(item.id);
+    return true;
+  });
+
+  const groups = [
+    {
+      title: "Granular",
+      items: take((item) => {
+        return item.relatedEquipmentIds?.includes("scotts-elite-spreader") ||
+          ["pre-emergent", "fertilizer"].includes(item.primaryCategory);
+      })
+    },
+    {
+      title: "Liquid",
+      items: take((item) => {
+        return item.primaryCategory === "weed-control" &&
+          !item.relatedEquipmentIds?.includes("scotts-elite-spreader");
+      })
+    },
+    {
+      title: "Pest / insect",
+      items: take((item) => item.primaryCategory === "pest-control")
+    },
+    {
+      title: "Repair / beds",
+      items: take(() => true)
+    }
+  ];
+
+  return groups.filter((group) => group.items.length);
+}
+
+function groupedEquipment() {
+  const tools = state.data.equipment.equipment.filter((item) => item.category !== "application");
+  const used = new Set();
+  const take = (predicate) => tools.filter((item) => {
+    if (used.has(item.id) || !predicate(item)) return false;
+    used.add(item.id);
+    return true;
+  });
+
+  const groups = [
+    {
+      title: "Lawn / core gear",
+      items: take((item) => item.category === "mower")
+    },
+    {
+      title: "Milwaukee tools / attachments",
+      items: take((item) => item.name.startsWith("Milwaukee"))
+    },
+    {
+      title: "Other equipment",
+      items: take(() => true)
+    }
+  ];
+
+  return groups.filter((group) => group.items.length);
+}
+
+function categoryLabel(categoryId) {
+  return state.data.inventory.categories.find((category) => category.id === categoryId)?.label || categoryId;
+}
+
+function equipmentRelationship(item) {
+  const equipmentMap = new Map(state.data.equipment.equipment.map((tool) => [tool.id, tool]));
+  const childTools = (item.childEquipmentIds || [])
+    .map((id) => equipmentMap.get(id)?.name)
+    .filter(Boolean);
+  if (childTools.length) return `Parent for ${childTools.join(" / ")}`;
+  if (item.parentEquipmentId) return `Connects to ${equipmentMap.get(item.parentEquipmentId)?.name || item.parentEquipmentId}`;
+  return item.operatingNotes;
+}
+
+function applicatorAssignment(item) {
+  const inventoryMap = new Map(state.data.inventory.items.map((product) => [product.id, product]));
+  const productNames = (item.reservedForInventoryIds || [])
+    .map((id) => inventoryMap.get(id)?.name)
+    .filter(Boolean);
+  if (productNames.length) return `Dedicated to ${productNames.join(" / ")}`;
+
+  const categories = (item.relatedProductCategories || [])
+    .map(categoryLabel)
+    .filter(Boolean);
+  if (categories.length) return `Used for ${categories.join(" / ")}`;
+
+  return item.operatingNotes;
 }
 
 function propertySections() {
@@ -539,12 +696,6 @@ function propertySystemCard(system) {
   `;
 }
 
-function productSubtitle(item) {
-  return [item.productCode ? `Code ${item.productCode}` : "", item.unitSize || item.coverage || item.category]
-    .filter(Boolean)
-    .join(" / ");
-}
-
 function productToolLabel(item) {
   const equipment = state.data.equipment.equipment;
   const names = (item.relatedEquipmentIds || [])
@@ -552,36 +703,6 @@ function productToolLabel(item) {
     .filter(Boolean);
   if (names.length) return names.join(" / ");
   return item.spreaderSetting === "Not applicable." ? "No spreader" : "Label guidance";
-}
-
-function equipmentMeta(item) {
-  return [
-    item.status,
-    item.model ? `Model ${item.model}` : "",
-    item.purchased ? `Purchased ${item.purchased}` : ""
-  ].filter(Boolean).join(" / ");
-}
-
-function equipmentCard(item, settingMap, inventoryMap, equipmentMap) {
-  const linkedSettings = (item.knownSettings || []).map((id) => settingMap.get(id)).filter(Boolean);
-  const dedicatedProducts = (item.reservedForInventoryIds || [])
-    .map((id) => inventoryMap.get(id)?.name)
-    .filter(Boolean);
-  const childTools = (item.childEquipmentIds || [])
-    .map((id) => equipmentMap.get(id)?.name)
-    .filter(Boolean);
-  const categoryProducts = (item.relatedProductCategories || [])
-    .map((categoryId) => state.data.inventory.categories.find((category) => category.id === categoryId)?.label)
-    .filter(Boolean);
-  const relationshipText = [
-    dedicatedProducts.length ? `Dedicated to ${dedicatedProducts.join(" / ")}` : "",
-    categoryProducts.length ? `Used for ${categoryProducts.join(" / ")}` : "",
-    childTools.length ? `Parent for ${childTools.join(" / ")}` : "",
-    item.parentEquipmentId ? `Connects to ${equipmentMap.get(item.parentEquipmentId)?.name || item.parentEquipmentId}` : "",
-    linkedSettings.map((setting) => `${setting.label}: ${setting.value}`).join(" / "),
-    item.operatingNotes
-  ].filter(Boolean).join(" ");
-  return denseItem(item.name, equipmentMeta(item), relationshipText);
 }
 
 function denseItem(title, meta, body) {
@@ -694,8 +815,13 @@ function escapeHtml(value) {
 function icon(name) {
   const icons = {
     mark: `<svg viewBox="0 0 24 24"><path d="M4.5 18.5h15"></path><path d="M7 18.5c.3-3.4 1.4-5.8 3.3-7.5"></path><path d="M11.2 18.5c-.1-4.5.5-8.5 1.8-12.3"></path><path d="M15 18.5c.2-3.8 1-6.5 2.4-8.5"></path><path d="M9.3 18.5c-.5-2.5-1.4-4.3-2.7-5.5"></path><path d="M17.2 18.5c-.2-2.5-.8-4.3-1.9-5.6"></path></svg>`,
+    back: `<svg viewBox="0 0 24 24"><path d="M15 6 9 12l6 6"></path></svg>`,
     plan: `<svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"></path><path d="M8 9h8M8 13h5"></path><path d="M16 16l3 3"></path></svg>`,
     gear: `<svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"></path><path d="M12 3v3M12 18v3M4.2 7.5l2.6 1.5M17.2 15l2.6 1.5M4.2 16.5 6.8 15M17.2 9l2.6-1.5"></path></svg>`,
+    products: `<svg viewBox="0 0 24 24"><path d="M7 4h10v4l-1.8 2.3V19a2 2 0 0 1-2 2H10.8a2 2 0 0 1-2-2v-8.7L7 8V4Z"></path><path d="M9 8h6M9 14h6"></path></svg>`,
+    equipment: `<svg viewBox="0 0 24 24"><path d="M5 18h14"></path><path d="M7 18V9l4-3 6 4v8"></path><path d="M10 18v-5h4v5"></path><path d="M17 10l2-2"></path></svg>`,
+    applicators: `<svg viewBox="0 0 24 24"><path d="M7 5h8v5H7z"></path><path d="M9 10v9M13 10v9"></path><path d="M5 19h12"></path><path d="M17 7h2v5"></path><path d="M19 12c-2 1-3.5 2.4-4.5 4"></path></svg>`,
+    history: `<svg viewBox="0 0 24 24"><path d="M5 5h14v15l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2L7 20V5Z"></path><path d="M8 9h8M8 12h8M8 15h5"></path></svg>`,
     property: `<svg viewBox="0 0 24 24"><path d="M4 6c5-2 11 2 16 0v12c-5 2-11-2-16 0V6Z"></path><path d="M8 5v12M16 7v12"></path></svg>`,
     sun: `<svg viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"></path><path d="M12 3.8v2M12 18.2v2M4.8 12h2M17.2 12h2M6.9 6.9l1.4 1.4M15.7 15.7l1.4 1.4M17.1 6.9l-1.4 1.4M8.3 15.7l-1.4 1.4"></path></svg>`,
     cloud: `<svg viewBox="0 0 24 24"><path d="M7.2 17.5h9.6a3.2 3.2 0 0 0 .5-6.4 5.1 5.1 0 0 0-9.8 1.2h-.3a2.6 2.6 0 0 0 0 5.2Z"></path></svg>`,
