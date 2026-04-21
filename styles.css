@@ -327,6 +327,10 @@ body.is-home .views {
   padding-top: 9px;
 }
 
+.hourly-panel:empty {
+  display: none;
+}
+
 .hourly-head {
   display: flex;
   align-items: center;
@@ -1082,6 +1086,58 @@ body.is-home .views {
   margin-top: 10px;
 }
 
+.compact-disclosure {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    var(--panel-gradient),
+    var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.compact-disclosure + .compact-disclosure {
+  margin-top: 8px;
+}
+
+.compact-disclosure summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  cursor: pointer;
+  list-style: none;
+  padding: 10px;
+}
+
+.compact-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.compact-disclosure summary span {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 930;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compact-disclosure summary small {
+  border: 1px solid var(--inner-line);
+  border-radius: 999px;
+  background: var(--inner-bg);
+  color: var(--subtle);
+  padding: 3px 7px;
+  font-size: 0.63rem;
+  font-weight: 850;
+}
+
+.compact-disclosure .compact-list {
+  border-top: 1px solid var(--line-soft);
+  padding: 8px;
+}
+
 .compact-section h4 {
   margin: 0 0 7px;
   color: var(--subtle);
@@ -1230,6 +1286,153 @@ body.is-home .views {
   font-size: 0.62rem;
   font-weight: 900;
   text-transform: uppercase;
+}
+
+.snapshot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.snapshot-tile {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  grid-template-areas:
+    "icon value"
+    "icon label";
+  align-items: center;
+  min-height: 62px;
+  gap: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    var(--panel-gradient),
+    var(--surface);
+  padding: 9px;
+}
+
+.snapshot-icon {
+  grid-area: icon;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid var(--inner-line);
+  border-radius: 8px;
+  background: var(--inner-bg);
+  color: var(--accent-strong);
+}
+
+.snapshot-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.snapshot-tile strong {
+  grid-area: value;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.98rem;
+  font-weight: 950;
+  line-height: 1.08;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.snapshot-tile small {
+  grid-area: label;
+  overflow: hidden;
+  color: var(--subtle);
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.snapshot-section {
+  margin-top: 12px;
+}
+
+.snapshot-section h4 {
+  margin: 0 0 8px;
+  color: var(--subtle);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.area-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.area-bar {
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--inner-line);
+  border-radius: 8px;
+  background: var(--inner-bg);
+  padding: 8px;
+}
+
+.area-bar div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.area-bar strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.area-bar span {
+  color: var(--subtle);
+  font-size: 0.68rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.area-bar i {
+  display: block;
+  height: 5px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, var(--accent-strong) var(--area-percent), transparent var(--area-percent)),
+    var(--line-soft);
+}
+
+.rhythm-strip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.rhythm-strip span,
+.rhythm-strip strong {
+  flex: 0 0 auto;
+  border: 1px solid var(--inner-line);
+  border-radius: 999px;
+  background: var(--inner-bg);
+  color: var(--muted);
+  padding: 6px 9px;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.rhythm-strip strong {
+  border-color: var(--line-strong);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
 }
 
 .product-filter {
@@ -1452,6 +1655,7 @@ body.is-home .bottom-nav {
 .gear-tile-icon path,
 .gear-back path,
 .applicator-tile path,
+.snapshot-icon path,
 .phase-nav path,
 .plan-item-icon path,
 .plan-mini-item path {

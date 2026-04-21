@@ -119,7 +119,8 @@ function bindWeather() {
   document.querySelector("#weather-grid").addEventListener("click", (event) => {
     const button = event.target.closest("[data-weather-date]");
     if (!button) return;
-    state.activeWeatherDate = button.dataset.weatherDate;
+    const date = button.dataset.weatherDate;
+    state.activeWeatherDate = state.activeWeatherDate === date ? null : date;
     renderWeatherPanel();
   });
 }
@@ -238,7 +239,6 @@ function renderHome() {
 function renderWeatherPanel() {
   const weather = state.data.profile.weatherAwareness;
   const forecast = state.weatherForecast?.daily || weather.forecast || [];
-  if (!state.activeWeatherDate && forecast[0]) state.activeWeatherDate = forecast[0].date || forecast[0].day;
   text("#weather-heading", `3-day outlook / ${WEATHER_CONFIG.label}`);
   document.querySelector("#weather-grid").innerHTML = forecast.slice(0, 3).map((day) => {
     const dayKey = day.date || day.day;
@@ -269,7 +269,12 @@ async function loadLiveWeather() {
     if (!response.ok) throw new Error(`Weather request failed: ${response.status}`);
     const payload = await response.json();
     state.weatherForecast = normalizeWeather(payload);
-    state.activeWeatherDate = state.weatherForecast.daily[0]?.date || state.activeWeatherDate;
+    if (state.activeWeatherDate) {
+      const selected = state.weatherForecast.daily.find((day) => {
+        return day.date === state.activeWeatherDate || day.day === state.activeWeatherDate;
+      });
+      state.activeWeatherDate = selected?.date || state.activeWeatherDate;
+    }
     renderWeatherPanel();
   } catch (error) {
     console.warn("Using seeded weather fallback.", error);
@@ -312,6 +317,10 @@ function normalizeWeather(payload) {
 function renderHourlyPanel(message = "") {
   const panel = document.querySelector("#hourly-panel");
   const forecast = state.weatherForecast;
+  if (!state.activeWeatherDate) {
+    panel.innerHTML = "";
+    return;
+  }
   if (!forecast) {
     panel.innerHTML = message
       ? `<p class="weather-note">${escapeHtml(message)}</p>`
@@ -557,8 +566,9 @@ function renderProductsGear() {
   const productGroups = groupedProducts();
   document.querySelector("#gear-focus").innerHTML = `
     ${gearDetailHead("products", "Usual buys", "Products", "Grouped by how they are used, not by stock counts.")}
-    ${productGroups.map((group) => compactSection(
+    ${productGroups.map((group) => compactDisclosure(
       group.title,
+      `${group.items.length} ${group.items.length === 1 ? "item" : "items"}`,
       group.items.map(productRow).join("") || emptyCompactRow("No products recorded", group.title, "")
     )).join("")}
   `;
@@ -568,8 +578,9 @@ function renderEquipmentGear() {
   const groups = groupedEquipment();
   document.querySelector("#gear-focus").innerHTML = `
     ${gearDetailHead("equipment", "Owned gear", "Equipment", "Core tools grouped by how you would look them up.")}
-    ${groups.map((group) => compactSection(
+    ${groups.map((group) => compactDisclosure(
       group.title,
+      `${group.items.length} ${group.items.length === 1 ? "item" : "items"}`,
       group.items.map(equipmentRow).join("") || emptyCompactRow("No gear recorded", group.title, "")
     )).join("")}
   `;
@@ -633,6 +644,18 @@ function compactSection(title, body) {
       <h4>${escapeHtml(title)}</h4>
       <div class="compact-list">${body}</div>
     </section>
+  `;
+}
+
+function compactDisclosure(title, note, body) {
+  return `
+    <details class="compact-disclosure">
+      <summary>
+        <span>${escapeHtml(title)}</span>
+        <small>${escapeHtml(note || "")}</small>
+      </summary>
+      <div class="compact-list">${body}</div>
+    </details>
   `;
 }
 
@@ -944,30 +967,56 @@ function renderPropertyOverview() {
   const { systems, zones } = state.data;
   const irrigation = systems.irrigation;
   const activeZones = irrigation.zones.filter((zone) => zone.status === "active");
-  const coverageNotes = zones.propertySummary.coverageNotes.join(" ");
+  const totalLandscapeRefs = zones.landscape.reduce((count, group) => count + (group.items || []).length, 0);
   document.querySelector("#property-focus").innerHTML = `
     <div class="gear-head">
       <span class="label">Property snapshot</span>
       <h3>Overview</h3>
-      <p>${escapeHtml(`${formatNumber(zones.propertySummary.totalLawnAreaSqFt)} sq ft of lawn across ${zones.zones.length} areas. ${coverageNotes}`)}</p>
     </div>
-    <div class="metric-grid">
-      <div><strong>${formatNumber(zones.propertySummary.totalLawnAreaSqFt)}</strong><span>lawn sq ft</span></div>
-      <div><strong>${systems.irrigation.activeRuntimePerWateringDayMinutes}</strong><span>active min/day</span></div>
-      <div><strong>${zones.zones.length}</strong><span>lawn areas</span></div>
+    <div class="snapshot-grid">
+      ${propertySnapshotTile("property", formatNumber(zones.propertySummary.totalLawnAreaSqFt), "lawn sq ft")}
+      ${propertySnapshotTile("area", zones.zones.length, "lawn areas")}
+      ${propertySnapshotTile("water", irrigation.wateringDays.join(" / "), irrigation.controller.startTime)}
+      ${propertySnapshotTile("clock", irrigation.activeRuntimePerWateringDayMinutes, "active min/day")}
+      ${propertySnapshotTile("applicators", activeZones.length, "active zones")}
+      ${propertySnapshotTile("plant", zones.landscape.length, `${totalLandscapeRefs} plant refs`)}
     </div>
-    <section class="gear-group">
+    <section class="snapshot-section">
       <h4>Lawn area breakdown</h4>
-      <div class="dense-list">
-        ${zones.zones.map((zone) => denseItem(zone.name, `${formatNumber(zone.areaSqFt)} sq ft`, zone.irrigationZoneRefs?.length ? `Irrigation Z${zone.irrigationZoneRefs.join(", Z")}` : "")).join("")}
+      <div class="area-bars">
+        ${zones.zones.map((zone) => lawnAreaBar(zone, zones.propertySummary.totalLawnAreaSqFt)).join("")}
       </div>
     </section>
-    <section class="gear-group">
-      <h4>Irrigation quick summary</h4>
-      <div class="dense-list">
-        ${denseItem(irrigation.controller.name, `${activeZones.length} active zones / ${irrigation.activeRuntimePerWateringDayMinutes} min`, `${irrigation.wateringDays.join(" / ")} at ${irrigation.controller.startTime}. No rain sensor.`)}
+    <section class="snapshot-section">
+      <h4>Irrigation rhythm</h4>
+      <div class="rhythm-strip">
+        ${irrigation.wateringDays.map((day) => `<span>${escapeHtml(day.slice(0, 3))}</span>`).join("")}
+        <strong>${escapeHtml(irrigation.controller.startTime)}</strong>
       </div>
     </section>
+  `;
+}
+
+function propertySnapshotTile(iconName, value, label) {
+  return `
+    <div class="snapshot-tile">
+      <span class="snapshot-icon" aria-hidden="true">${icon(iconName)}</span>
+      <strong>${escapeHtml(value)}</strong>
+      <small>${escapeHtml(label)}</small>
+    </div>
+  `;
+}
+
+function lawnAreaBar(zone, totalArea) {
+  const percent = Math.max(4, Math.round((zone.areaSqFt / totalArea) * 100));
+  return `
+    <div class="area-bar">
+      <div>
+        <strong>${escapeHtml(zone.name)}</strong>
+        <span>${formatNumber(zone.areaSqFt)} sq ft</span>
+      </div>
+      <i style="--area-percent: ${percent}%"></i>
+    </div>
   `;
 }
 
@@ -1217,6 +1266,10 @@ function icon(name) {
     pump: `<svg viewBox="0 0 24 24"><path d="M8 8h8l1 11H7L8 8Z"></path><path d="M10 8V6a2 2 0 0 1 4 0v2"></path><path d="M9.5 12h5"></path><path d="M11 19v2M13 19v2"></path><path d="M17 10h2v4"></path></svg>`,
     history: `<svg viewBox="0 0 24 24"><path d="M5 5h14v15l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2L7 20V5Z"></path><path d="M8 9h8M8 12h8M8 15h5"></path></svg>`,
     property: `<svg viewBox="0 0 24 24"><path d="M4 6c5-2 11 2 16 0v12c-5 2-11-2-16 0V6Z"></path><path d="M8 5v12M16 7v12"></path></svg>`,
+    area: `<svg viewBox="0 0 24 24"><path d="M5 6h14v12H5z"></path><path d="M9 6v12M15 6v12"></path><path d="M5 10h14M5 14h14"></path></svg>`,
+    water: `<svg viewBox="0 0 24 24"><path d="M12 4c3 3.6 5 6.4 5 9a5 5 0 0 1-10 0c0-2.6 2-5.4 5-9Z"></path><path d="M9.5 14.5a2.7 2.7 0 0 0 3.8 1.8"></path></svg>`,
+    clock: `<svg viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 0 0 14 7 7 0 0 0 0-14Z"></path><path d="M12 8.5V12l2.4 1.7"></path></svg>`,
+    plant: `<svg viewBox="0 0 24 24"><path d="M12 20V9"></path><path d="M12 13c-4.2 0-6.5-2.2-7-6 4 .1 6.3 2.1 7 6Z"></path><path d="M12 15c3.8 0 6-2 6.7-5.7-3.6 0-5.8 1.9-6.7 5.7Z"></path></svg>`,
     sun: `<svg viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"></path><path d="M12 3.8v2M12 18.2v2M4.8 12h2M17.2 12h2M6.9 6.9l1.4 1.4M15.7 15.7l1.4 1.4M17.1 6.9l-1.4 1.4M8.3 15.7l-1.4 1.4"></path></svg>`,
     cloud: `<svg viewBox="0 0 24 24"><path d="M7.2 17.5h9.6a3.2 3.2 0 0 0 .5-6.4 5.1 5.1 0 0 0-9.8 1.2h-.3a2.6 2.6 0 0 0 0 5.2Z"></path></svg>`,
     "partly-cloudy": `<svg viewBox="0 0 24 24"><path d="M8.2 8.2a3.4 3.4 0 0 1 5.9 2.4"></path><path d="M6.2 5.7 5 4.5M12 3v1.8M3 10.7h1.8"></path><path d="M7.3 18h9.2a3 3 0 0 0 .5-5.9 4.8 4.8 0 0 0-9.2 1.1h-.5a2.4 2.4 0 0 0 0 4.8Z"></path></svg>`,
