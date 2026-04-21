@@ -48,12 +48,12 @@
     ]
   },
   "weatherAwareness": {
-    "status": "placeholder",
+    "status": "live-open-meteo-with-seeded-fallback",
     "location": {
       "label": "Valley Center, KS",
       "zip": "67147"
     },
-    "summary": "Live weather is not integrated yet. Use this area as the future hook for weather-aware recommendations.",
+    "summary": "Homepage weather loads a live 3-day Open-Meteo forecast for ZIP 67147, with this seeded forecast retained as a static fallback.",
     "forecast": [
       {
         "day": "Today",

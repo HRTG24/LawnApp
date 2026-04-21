@@ -17,11 +17,24 @@ const THEME_COLORS = {
   light: "#f1f4ed"
 };
 
+const WEATHER_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
+const WEATHER_CONFIG = {
+  latitude: 37.8347,
+  longitude: -97.3734,
+  timezone: "America/Chicago",
+  label: "Valley Center, KS",
+  zip: "67147"
+};
+
 const state = {
   data: null,
   activeView: "home",
   activeGearSection: "hub",
-  activePropertySection: "overview"
+  activePropertySection: "overview",
+  activePlanPhaseId: null,
+  activeWeatherDate: null,
+  weatherForecast: null,
+  activeApplicatorGroup: null
 };
 
 document.addEventListener("DOMContentLoaded", init);
@@ -34,9 +47,12 @@ async function init() {
     renderApp();
     bindNavigation();
     bindThemeToggle();
+    bindWeather();
+    bindPlanControls();
     bindGearCategories();
     bindPropertyCategories();
     showView("home", { focus: false });
+    loadLiveWeather();
   } catch (error) {
     renderLoadError(error);
   }
@@ -99,11 +115,44 @@ function bindNavigation() {
   });
 }
 
+function bindWeather() {
+  document.querySelector("#weather-grid").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-weather-date]");
+    if (!button) return;
+    state.activeWeatherDate = button.dataset.weatherDate;
+    renderWeatherPanel();
+  });
+}
+
+function bindPlanControls() {
+  document.querySelector("[data-plan-prev]").addEventListener("click", () => shiftPlanPhase(-1));
+  document.querySelector("[data-plan-next]").addEventListener("click", () => shiftPlanPhase(1));
+  document.querySelector("#plan-phase-progress").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-plan-phase]");
+    if (!button) return;
+    state.activePlanPhaseId = button.dataset.planPhase;
+    renderPlan();
+  });
+
+  const planView = document.querySelector("#plan-view");
+  let startX = 0;
+  planView.addEventListener("touchstart", (event) => {
+    startX = event.touches[0]?.clientX || 0;
+  }, { passive: true });
+  planView.addEventListener("touchend", (event) => {
+    const endX = event.changedTouches[0]?.clientX || 0;
+    const delta = endX - startX;
+    if (Math.abs(delta) < 54) return;
+    shiftPlanPhase(delta < 0 ? 1 : -1);
+  }, { passive: true });
+}
+
 function bindGearCategories() {
   document.querySelector("#gear-category-strip").addEventListener("click", (event) => {
     const button = event.target.closest("[data-gear-section]");
     if (!button) return;
     state.activeGearSection = button.dataset.gearSection;
+    state.activeApplicatorGroup = null;
     renderGearCategories();
     renderGear();
   });
@@ -112,6 +161,7 @@ function bindGearCategories() {
     const sectionButton = event.target.closest("[data-gear-section]");
     if (sectionButton) {
       state.activeGearSection = sectionButton.dataset.gearSection;
+      state.activeApplicatorGroup = null;
       renderGearCategories();
       renderGear();
       return;
@@ -120,9 +170,23 @@ function bindGearCategories() {
     const backButton = event.target.closest("[data-gear-back]");
     if (backButton) {
       state.activeGearSection = "hub";
+      state.activeApplicatorGroup = null;
       renderGearCategories();
       renderGear();
       return;
+    }
+
+    const applicatorButton = event.target.closest("[data-applicator-group]");
+    if (applicatorButton) {
+      state.activeApplicatorGroup = applicatorButton.dataset.applicatorGroup;
+      renderApplicatorsGear();
+      return;
+    }
+
+    const applicatorBack = event.target.closest("[data-applicator-back]");
+    if (applicatorBack) {
+      state.activeApplicatorGroup = null;
+      renderApplicatorsGear();
     }
   });
 }
@@ -173,27 +237,124 @@ function renderHome() {
 
 function renderWeatherPanel() {
   const weather = state.data.profile.weatherAwareness;
-  const forecast = weather.forecast || [];
-  text("#weather-heading", `3-day outlook / ${weather.location?.label || "Weather"}`);
-  document.querySelector("#weather-grid").innerHTML = forecast.slice(0, 3).map((day) => `
-    <article class="weather-day" title="${escapeHtml(day.condition || "")}">
-      <span>${escapeHtml(day.day)}</span>
-      <i aria-hidden="true">${icon(day.icon || "cloud")}</i>
-      <strong>${formatTemperature(day.high)} / ${formatTemperature(day.low)}</strong>
-    </article>
-  `).join("");
+  const forecast = state.weatherForecast?.daily || weather.forecast || [];
+  if (!state.activeWeatherDate && forecast[0]) state.activeWeatherDate = forecast[0].date || forecast[0].day;
+  text("#weather-heading", `3-day outlook / ${WEATHER_CONFIG.label}`);
+  document.querySelector("#weather-grid").innerHTML = forecast.slice(0, 3).map((day) => {
+    const dayKey = day.date || day.day;
+    return `
+      <button class="weather-day ${dayKey === state.activeWeatherDate ? "active" : ""}" type="button" data-weather-date="${escapeHtml(dayKey)}" title="${escapeHtml(day.condition || "")}">
+        <span>${escapeHtml(day.day)}</span>
+        <i aria-hidden="true">${icon(day.icon || "cloud")}</i>
+        <strong>${formatTemperature(day.high)} / ${formatTemperature(day.low)}</strong>
+      </button>
+    `;
+  }).join("");
+  renderHourlyPanel();
+}
+
+async function loadLiveWeather() {
+  try {
+    const params = new URLSearchParams({
+      latitude: WEATHER_CONFIG.latitude,
+      longitude: WEATHER_CONFIG.longitude,
+      daily: "weather_code,temperature_2m_max,temperature_2m_min",
+      hourly: "temperature_2m,precipitation_probability,wind_speed_10m,weather_code",
+      temperature_unit: "fahrenheit",
+      wind_speed_unit: "mph",
+      timezone: WEATHER_CONFIG.timezone,
+      forecast_days: "3"
+    });
+    const response = await fetch(`${WEATHER_ENDPOINT}?${params.toString()}`);
+    if (!response.ok) throw new Error(`Weather request failed: ${response.status}`);
+    const payload = await response.json();
+    state.weatherForecast = normalizeWeather(payload);
+    state.activeWeatherDate = state.weatherForecast.daily[0]?.date || state.activeWeatherDate;
+    renderWeatherPanel();
+  } catch (error) {
+    console.warn("Using seeded weather fallback.", error);
+    renderHourlyPanel("Live weather unavailable");
+  }
+}
+
+function normalizeWeather(payload) {
+  const daily = (payload.daily?.time || []).slice(0, 3).map((date, index) => {
+    const code = payload.daily.weather_code?.[index];
+    return {
+      date,
+      day: weatherDayLabel(date, index),
+      condition: weatherCodeLabel(code),
+      icon: weatherCodeIcon(code),
+      high: payload.daily.temperature_2m_max?.[index],
+      low: payload.daily.temperature_2m_min?.[index]
+    };
+  });
+
+  const hourly = {};
+  (payload.hourly?.time || []).forEach((time, index) => {
+    const date = time.slice(0, 10);
+    if (!hourly[date]) hourly[date] = [];
+    const hour = Number(time.slice(11, 13));
+    if (hour < 6 || hour > 21 || hour % 3 !== 0) return;
+    hourly[date].push({
+      time,
+      hour: formatHour(time),
+      temp: payload.hourly.temperature_2m?.[index],
+      wind: payload.hourly.wind_speed_10m?.[index],
+      rain: payload.hourly.precipitation_probability?.[index],
+      icon: weatherCodeIcon(payload.hourly.weather_code?.[index])
+    });
+  });
+
+  return { daily, hourly };
+}
+
+function renderHourlyPanel(message = "") {
+  const panel = document.querySelector("#hourly-panel");
+  const forecast = state.weatherForecast;
+  if (!forecast) {
+    panel.innerHTML = message
+      ? `<p class="weather-note">${escapeHtml(message)}</p>`
+      : `<p class="weather-note">Loading live hourly forecast...</p>`;
+    return;
+  }
+  const activeDay = forecast.daily.find((day) => day.date === state.activeWeatherDate) || forecast.daily[0];
+  const hours = forecast.hourly[activeDay?.date] || [];
+  panel.innerHTML = `
+    <div class="hourly-head">
+      <strong>${escapeHtml(activeDay?.day || "Today")}</strong>
+      <span>${escapeHtml(activeDay?.condition || "Forecast")}</span>
+    </div>
+    <div class="hourly-grid">
+      ${hours.slice(0, 6).map((hour) => `
+        <div class="hourly-cell">
+          <span>${escapeHtml(hour.hour)}</span>
+          <strong>${formatTemperature(hour.temp)}</strong>
+          <small>${Math.round(Number(hour.wind || 0))} mph</small>
+          <small>${hour.rain ?? "--"}% rain</small>
+        </div>
+      `).join("")}
+    </div>
+  `;
 }
 
 function renderPlan() {
   const { profile, seasonal } = state.data;
-  const activePhase = currentPlanPhase();
+  const phases = planPhaseOrder();
+  if (!state.activePlanPhaseId) state.activePlanPhaseId = seasonal.currentPhaseId || profile.currentSeason.phaseId;
+  const activePhase = phases.find((phase) => phase.id === state.activePlanPhaseId) || currentPlanPhase();
+  state.activePlanPhaseId = activePhase.id;
+  const phaseIndex = phases.findIndex((phase) => phase.id === activePhase.id);
   const activeItems = [...(activePhase.items || [])].sort(planPrioritySort);
-  const priorityItems = activeItems.slice(0, 4);
-  const triggerItems = activeItems.filter((item) => item.type === "weather" || item.trigger).slice(0, 3);
-  const buyItems = activeItems.filter((item) => item.type === "buy" || item.buyAhead).slice(0, 3);
-  const timelinePhases = planPhaseOrder();
+  const focusItems = activeItems.filter((item) => item.type === "core" || (item.type === "conditional" && item.priority === "high")).slice(0, 3);
+  const watchItems = activeItems.filter((item) => item.type === "weather" || item.trigger || item.condition).slice(0, 3);
+  const prepItems = activeItems.filter((item) => item.type === "buy" || item.buyAhead || item.sequence).slice(0, 3);
 
-  document.querySelector("#plan-phase-card").innerHTML = `
+  document.querySelector("[data-plan-prev]").innerHTML = icon("back");
+  document.querySelector("[data-plan-next]").innerHTML = icon("next");
+  document.querySelector("[data-plan-prev]").disabled = phaseIndex <= 0;
+  document.querySelector("[data-plan-next]").disabled = phaseIndex >= phases.length - 1;
+  document.querySelector("#plan-phase-copy").innerHTML = `
     <div>
       <span class="label">${escapeHtml(activePhase.window)}</span>
       <h3>${escapeHtml(activePhase.label)}</h3>
@@ -201,30 +362,26 @@ function renderPlan() {
     </div>
     <div class="plan-phase-meta">
       <span>${escapeHtml(seasonal.planningModel.region)}</span>
-      <span>${escapeHtml(planTypeLabel("core"))}</span>
+      <span>${phaseIndex + 1} / ${phases.length}</span>
     </div>
   `;
 
-  document.querySelector("#plan-priority-list").innerHTML = priorityItems
-    .map(planItemRow)
-    .join("") || emptyState("No current phase items recorded.");
+  document.querySelector("#plan-priority-list").innerHTML = focusItems
+    .map((item) => planItemRow(item, "focus"))
+    .join("") || emptyState("No focus items recorded.");
 
-  document.querySelector("#plan-trigger-list").innerHTML = triggerItems
-    .map(planMiniItem)
-    .join("") || emptyState("No trigger checks for this phase.");
+  document.querySelector("#plan-trigger-list").innerHTML = watchItems
+    .map((item) => planMiniItem(item, "watch"))
+    .join("") || emptyState("No watch items for this phase.");
 
-  document.querySelector("#plan-buy-list").innerHTML = buyItems
-    .map(planMiniItem)
-    .join("") || emptyState("No buy-ahead items for this phase.");
+  document.querySelector("#plan-buy-list").innerHTML = prepItems
+    .map((item) => planMiniItem(item, "prep"))
+    .join("") || emptyState("No prep items for this phase.");
 
-  document.querySelector("#plan-timeline-list").innerHTML = [
-    ...timelinePhases
-  ].map((phase) => `
-    <article class="phase-row ${phase.id === activePhase.id ? "active" : ""}">
-      <span>${escapeHtml(phase.window)}</span>
-      <strong>${escapeHtml(phase.label)}</strong>
-      <small>${escapeHtml(concise(phase.summary, 96))}</small>
-    </article>
+  document.querySelector("#plan-phase-progress").innerHTML = phases.map((phase, index) => `
+    <button class="${phase.id === activePhase.id ? "active" : ""}" type="button" data-plan-phase="${escapeHtml(phase.id)}" aria-label="${escapeHtml(phase.label)}">
+      <span>${index + 1}</span>
+    </button>
   `).join("");
 }
 
@@ -244,6 +401,16 @@ function planPhaseOrder() {
     .filter(Boolean);
 }
 
+function shiftPlanPhase(direction) {
+  const phases = planPhaseOrder();
+  const currentId = state.activePlanPhaseId || currentPlanPhase().id;
+  const currentIndex = phases.findIndex((phase) => phase.id === currentId);
+  const nextIndex = Math.max(0, Math.min(phases.length - 1, currentIndex + direction));
+  if (nextIndex === currentIndex) return;
+  state.activePlanPhaseId = phases[nextIndex].id;
+  renderPlan();
+}
+
 function planPrioritySort(a, b) {
   const priorityRank = { high: 0, medium: 1, low: 2 };
   const typeRank = { core: 0, weather: 1, conditional: 2, buy: 3 };
@@ -251,14 +418,13 @@ function planPrioritySort(a, b) {
     (typeRank[a.type] ?? 4) - (typeRank[b.type] ?? 4);
 }
 
-function planItemRow(item) {
+function planItemRow(item, sectionType = "focus") {
   return `
-    <article class="plan-item ${escapeHtml(item.type)}">
-      <span class="plan-item-icon" aria-hidden="true">${icon(planTypeIcon(item.type))}</span>
+    <article class="plan-item ${escapeHtml(sectionType)}">
+      <span class="plan-item-icon" aria-hidden="true">${icon(planSectionIcon(sectionType))}</span>
       <div>
         <header>
           <strong>${escapeHtml(item.title)}</strong>
-          <em>${escapeHtml(planTypeLabel(item.type))}</em>
         </header>
         <p>${escapeHtml(item.guidance)}</p>
         <div class="mini-meta">
@@ -272,13 +438,13 @@ function planItemRow(item) {
   `;
 }
 
-function planMiniItem(item) {
-  const note = item.buyAhead && item.guidance
+function planMiniItem(item, sectionType = "watch") {
+  const note = sectionType === "prep" && item.buyAhead && item.guidance
     ? `${item.buyAhead} ${item.guidance}`
     : item.buyAhead || item.trigger || item.condition || item.sequence || item.guidance;
   return `
     <article class="plan-mini-item">
-      <span aria-hidden="true">${icon(planTypeIcon(item.type))}</span>
+      <span aria-hidden="true">${icon(planSectionIcon(sectionType))}</span>
       <div>
         <strong>${escapeHtml(item.title)}</strong>
         <small>${escapeHtml(concise(note, 88))}</small>
@@ -287,21 +453,11 @@ function planMiniItem(item) {
   `;
 }
 
-function planTypeLabel(type) {
+function planSectionIcon(type) {
   return {
-    core: "Core",
-    weather: "Weather",
-    conditional: "Conditional",
-    buy: "Buy ahead"
-  }[type] || "Plan";
-}
-
-function planTypeIcon(type) {
-  return {
-    core: "plan-core",
-    weather: "plan-weather",
-    conditional: "plan-conditional",
-    buy: "plan-buy"
+    focus: "plan-core",
+    watch: "plan-weather",
+    prep: "plan-buy"
   }[type] || "plan-core";
 }
 
@@ -420,12 +576,44 @@ function renderEquipmentGear() {
 }
 
 function renderApplicatorsGear() {
-  const applicators = state.data.equipment.equipment.filter((item) => item.category === "application");
+  const groups = applicatorGroups();
+  const selected = groups.find((group) => group.id === state.activeApplicatorGroup);
+  if (selected) {
+    renderApplicatorDetail(selected);
+    return;
+  }
   document.querySelector("#gear-focus").innerHTML = `
-    ${gearDetailHead("applicators", "Product-to-tool map", "Applicators", "Spreader and sprayer assignments, kept explicit.")}
-    <div class="compact-list applicator-map">
-      ${applicators.map(applicatorRow).join("")}
+    ${gearDetailHead("applicators", "Application settings", "Applicators", "Choose an applicator to see assignments and product-specific settings.")}
+    <div class="applicator-hub">
+      ${groups.map((group) => `
+        <button class="applicator-tile" type="button" data-applicator-group="${escapeHtml(group.id)}">
+          <span aria-hidden="true">${icon(group.icon)}</span>
+          <strong>${escapeHtml(group.label)}</strong>
+          <small>${escapeHtml(group.summary)}</small>
+        </button>
+      `).join("")}
     </div>
+  `;
+}
+
+function renderApplicatorDetail(group) {
+  document.querySelector("#gear-focus").innerHTML = `
+    <div class="gear-detail-head">
+      <button class="gear-back" type="button" data-applicator-back aria-label="Back to applicators">
+        ${icon("back")}
+      </button>
+      <div>
+        <span class="label">${escapeHtml(group.eyebrow)}</span>
+        <h3>${escapeHtml(group.label)}</h3>
+        <p>${escapeHtml(group.detail)}</p>
+      </div>
+    </div>
+    <section class="compact-section">
+      <h4>${escapeHtml(group.settingTitle)}</h4>
+      <div class="compact-list">
+        ${group.rows.map((row) => compactRow(row.title, row.support, row.meta, row.badge)).join("")}
+      </div>
+    </section>
   `;
 }
 
@@ -639,6 +827,80 @@ function groupedEquipment() {
   return groups.filter((group) => group.items.length);
 }
 
+function applicatorGroups() {
+  const equipment = state.data.equipment.equipment;
+  const inventory = state.data.inventory.items;
+  const settings = state.data.settings.settings;
+  const byEquipmentId = (id) => equipment.find((item) => item.id === id);
+  const settingMap = new Map(settings.map((setting) => [setting.id, setting]));
+  const productRows = (equipmentId) => inventory
+    .filter((item) => (item.relatedEquipmentIds || []).includes(equipmentId))
+    .map((item) => ({
+      title: item.name,
+      support: settingSupport(item.spreaderSetting) || settingSupport(item.notes),
+      meta: [categoryLabel(item.primaryCategory), item.coverage || item.unitSize],
+      badge: hasKnownSetting(item.spreaderSetting) ? "known" : "placeholder"
+    }));
+
+  const spreader = byEquipmentId("scotts-elite-spreader");
+  const dial = byEquipmentId("ortho-dial-n-spray");
+  const pumpSprayers = equipment.filter((item) => item.id.startsWith("hdx-pump-sprayer"));
+  const pumpRows = pumpSprayers.map((sprayer) => {
+    const assigned = (sprayer.reservedForInventoryIds || [])
+      .map((id) => inventory.find((item) => item.id === id))
+      .filter(Boolean);
+    const setting = (sprayer.knownSettings || []).map((id) => settingMap.get(id)).find(Boolean);
+    return {
+      title: assigned[0]?.name || sprayer.name,
+      support: setting?.value || sprayer.operatingNotes,
+      meta: [sprayer.name, sprayer.status],
+      badge: "dedicated"
+    };
+  });
+
+  return [
+    {
+      id: "scotts-elite-spreader",
+      label: "Scotts Elite Spreader",
+      icon: "applicators",
+      summary: "Granular product settings",
+      eyebrow: "Granular tool",
+      detail: spreader?.operatingNotes || "Primary granular applicator.",
+      settingTitle: "Product settings",
+      rows: productRows("scotts-elite-spreader")
+    },
+    {
+      id: "ortho-dial-n-spray",
+      label: "Ortho Dial N Spray",
+      icon: "sprayer",
+      summary: "Hose-end liquid settings",
+      eyebrow: "Hose-end tool",
+      detail: dial?.operatingNotes || "Hose-end liquid applicator.",
+      settingTitle: "Product settings",
+      rows: productRows("ortho-dial-n-spray")
+    },
+    {
+      id: "pump-sprayer",
+      label: "Pump Sprayer",
+      icon: "pump",
+      summary: "Dedicated sprayer assignments",
+      eyebrow: "Dedicated sprayers",
+      detail: "One pump sprayer family with separate dedicated assignments.",
+      settingTitle: "Assignments",
+      rows: pumpRows
+    }
+  ];
+}
+
+function settingSupport(value) {
+  if (!value || value === "Not applicable.") return "Setting not needed or not recorded.";
+  return value;
+}
+
+function hasKnownSetting(value) {
+  return Boolean(value) && !/unknown|not recorded|label guidance/i.test(value);
+}
+
 function categoryLabel(categoryId) {
   return state.data.inventory.categories.find((category) => category.id === categoryId)?.label || categoryId;
 }
@@ -679,8 +941,9 @@ function propertySections() {
 }
 
 function renderPropertyOverview() {
-  const { systems, zones, settings } = state.data;
-  const nonIrrigationSystems = systems.systems.filter((system) => !system.id.startsWith("irrigation"));
+  const { systems, zones } = state.data;
+  const irrigation = systems.irrigation;
+  const activeZones = irrigation.zones.filter((zone) => zone.status === "active");
   const coverageNotes = zones.propertySummary.coverageNotes.join(" ");
   document.querySelector("#property-focus").innerHTML = `
     <div class="gear-head">
@@ -694,15 +957,15 @@ function renderPropertyOverview() {
       <div><strong>${zones.zones.length}</strong><span>lawn areas</span></div>
     </div>
     <section class="gear-group">
-      <h4>Systems</h4>
-      <div class="system-list">
-        ${nonIrrigationSystems.map((system) => propertySystemCard(system)).join("")}
+      <h4>Lawn area breakdown</h4>
+      <div class="dense-list">
+        ${zones.zones.map((zone) => denseItem(zone.name, `${formatNumber(zone.areaSqFt)} sq ft`, zone.irrigationZoneRefs?.length ? `Irrigation Z${zone.irrigationZoneRefs.join(", Z")}` : "")).join("")}
       </div>
     </section>
     <section class="gear-group">
-      <h4>Reference Notes</h4>
+      <h4>Irrigation quick summary</h4>
       <div class="dense-list">
-        ${settings.lessonsLearned.slice(0, 3).map((lesson) => denseItem(lesson, "lesson", "")).join("")}
+        ${denseItem(irrigation.controller.name, `${activeZones.length} active zones / ${irrigation.activeRuntimePerWateringDayMinutes} min`, `${irrigation.wateringDays.join(" / ")} at ${irrigation.controller.startTime}. No rain sensor.`)}
       </div>
     </section>
   `;
@@ -893,6 +1156,36 @@ function formatTemperature(value) {
   return `${Math.round(Number(value))}°`;
 }
 
+function formatHour(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) return value.slice(11, 16);
+  return new Intl.DateTimeFormat(undefined, { hour: "numeric" }).format(date);
+}
+
+function weatherDayLabel(value, index) {
+  if (index === 0) return "Today";
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  return new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date);
+}
+
+function weatherCodeLabel(code) {
+  if ([0, 1].includes(code)) return "Clear";
+  if ([2].includes(code)) return "Partly cloudy";
+  if ([3, 45, 48].includes(code)) return "Cloudy";
+  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return "Rain";
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return "Snow";
+  if ([95, 96, 99].includes(code)) return "Storms";
+  return "Forecast";
+}
+
+function weatherCodeIcon(code) {
+  if ([0, 1].includes(code)) return "sun";
+  if ([2].includes(code)) return "partly-cloudy";
+  if ([51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(code)) return "rain";
+  return "cloud";
+}
+
 function formatNumber(value) {
   return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(Number(value || 0));
 }
@@ -910,6 +1203,7 @@ function icon(name) {
   const icons = {
     mark: `<svg viewBox="0 0 24 24"><path d="M4.5 18.5h15"></path><path d="M7 18.5c.3-3.4 1.4-5.8 3.3-7.5"></path><path d="M11.2 18.5c-.1-4.5.5-8.5 1.8-12.3"></path><path d="M15 18.5c.2-3.8 1-6.5 2.4-8.5"></path><path d="M9.3 18.5c-.5-2.5-1.4-4.3-2.7-5.5"></path><path d="M17.2 18.5c-.2-2.5-.8-4.3-1.9-5.6"></path></svg>`,
     back: `<svg viewBox="0 0 24 24"><path d="M15 6 9 12l6 6"></path></svg>`,
+    next: `<svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"></path></svg>`,
     plan: `<svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"></path><path d="M8 9h8M8 13h5"></path><path d="M16 16l3 3"></path></svg>`,
     "plan-core": `<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17 19 7"></path><path d="M5 5h14v14H5z"></path></svg>`,
     "plan-weather": `<svg viewBox="0 0 24 24"><path d="M7.2 14.7h9.6a3 3 0 0 0 .5-6 5.1 5.1 0 0 0-9.8 1.2h-.3a2.4 2.4 0 0 0 0 4.8Z"></path><path d="M8.5 18.1 7.8 20M12 18.1l-.7 1.9M15.5 18.1l-.7 1.9"></path></svg>`,
@@ -919,6 +1213,8 @@ function icon(name) {
     products: `<svg viewBox="0 0 24 24"><path d="M7 4h10v4l-1.8 2.3V19a2 2 0 0 1-2 2H10.8a2 2 0 0 1-2-2v-8.7L7 8V4Z"></path><path d="M9 8h6M9 14h6"></path></svg>`,
     equipment: `<svg viewBox="0 0 24 24"><path d="M5 18h14"></path><path d="M7 18V9l4-3 6 4v8"></path><path d="M10 18v-5h4v5"></path><path d="M17 10l2-2"></path></svg>`,
     applicators: `<svg viewBox="0 0 24 24"><path d="M7 5h8v5H7z"></path><path d="M9 10v9M13 10v9"></path><path d="M5 19h12"></path><path d="M17 7h2v5"></path><path d="M19 12c-2 1-3.5 2.4-4.5 4"></path></svg>`,
+    sprayer: `<svg viewBox="0 0 24 24"><path d="M7 5h8v4H7z"></path><path d="M9 9v10h4V9"></path><path d="M7 19h8"></path><path d="M15 7h3l2 2"></path><path d="M20 9c-1.4.8-2.4 1.8-3 3"></path><path d="M20 13c-1.2.6-2.1 1.4-2.7 2.4"></path></svg>`,
+    pump: `<svg viewBox="0 0 24 24"><path d="M8 8h8l1 11H7L8 8Z"></path><path d="M10 8V6a2 2 0 0 1 4 0v2"></path><path d="M9.5 12h5"></path><path d="M11 19v2M13 19v2"></path><path d="M17 10h2v4"></path></svg>`,
     history: `<svg viewBox="0 0 24 24"><path d="M5 5h14v15l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2L7 20V5Z"></path><path d="M8 9h8M8 12h8M8 15h5"></path></svg>`,
     property: `<svg viewBox="0 0 24 24"><path d="M4 6c5-2 11 2 16 0v12c-5 2-11-2-16 0V6Z"></path><path d="M8 5v12M16 7v12"></path></svg>`,
     sun: `<svg viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"></path><path d="M12 3.8v2M12 18.2v2M4.8 12h2M17.2 12h2M6.9 6.9l1.4 1.4M15.7 15.7l1.4 1.4M17.1 6.9l-1.4 1.4M8.3 15.7l-1.4 1.4"></path></svg>`,

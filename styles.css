@@ -288,8 +288,14 @@ body.is-home .views {
   border: 1px solid var(--line-soft);
   border-radius: 7px;
   background: var(--inner-bg);
+  color: inherit;
   padding: 8px 4px;
   text-align: center;
+}
+
+.weather-day.active {
+  border-color: var(--line-strong);
+  background: var(--accent-soft);
 }
 
 .weather-day span {
@@ -313,6 +319,67 @@ body.is-home .views {
   font-size: 0.78rem;
   font-weight: 900;
   white-space: nowrap;
+}
+
+.hourly-panel {
+  margin-top: 9px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 9px;
+}
+
+.hourly-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.hourly-head strong {
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 950;
+}
+
+.hourly-head span,
+.weather-note {
+  color: var(--subtle);
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.weather-note {
+  margin: 0;
+  text-align: center;
+}
+
+.hourly-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.hourly-cell {
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--inner-line);
+  border-radius: 7px;
+  background: var(--inner-bg);
+  padding: 7px 5px;
+  text-align: center;
+}
+
+.hourly-cell span,
+.hourly-cell small {
+  color: var(--subtle);
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+.hourly-cell strong {
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 950;
 }
 
 .launcher-grid {
@@ -424,10 +491,33 @@ body.is-home .views {
 
 .plan-phase-card {
   display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  align-items: center;
   gap: 10px;
   margin-bottom: 10px;
   border-color: var(--line-strong);
   padding: 13px;
+}
+
+.phase-nav {
+  display: grid;
+  width: 38px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  padding: 0;
+}
+
+.phase-nav:disabled {
+  opacity: 0.35;
+}
+
+.phase-nav svg {
+  width: 22px;
+  height: 22px;
 }
 
 .plan-phase-card h3 {
@@ -614,6 +704,36 @@ body.is-home .views {
   min-width: 0;
 }
 
+.phase-progress {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin: 9px 0 2px;
+}
+
+.phase-progress button {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid var(--inner-line);
+  border-radius: 999px;
+  background: var(--inner-bg);
+  color: var(--subtle);
+  padding: 0;
+}
+
+.phase-progress button.active {
+  border-color: var(--line-strong);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.phase-progress span {
+  font-size: 0.62rem;
+  font-weight: 900;
+}
+
 .tight-section {
   margin-bottom: 11px;
   padding: 12px;
@@ -789,6 +909,65 @@ body.is-home .views {
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.applicator-hub {
+  display: grid;
+  gap: 8px;
+}
+
+.applicator-tile {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-areas:
+    "icon title"
+    "icon note";
+  align-items: center;
+  min-height: 68px;
+  gap: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    var(--panel-gradient),
+    var(--surface);
+  color: var(--ink);
+  padding: 10px;
+  text-align: left;
+}
+
+.applicator-tile span {
+  grid-area: icon;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid var(--inner-line);
+  border-radius: 8px;
+  background: var(--inner-bg);
+  color: var(--accent-strong);
+}
+
+.applicator-tile svg {
+  width: 24px;
+  height: 24px;
+}
+
+.applicator-tile strong {
+  grid-area: title;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 930;
+  line-height: 1.1;
+}
+
+.applicator-tile small {
+  grid-area: note;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .gear-hub {
@@ -1268,12 +1447,14 @@ body.is-home .bottom-nav {
 .brand-mark path,
 .home-mark path,
 .home-button path,
-  .launcher-icon path,
-  .weather-day path,
-  .gear-tile-icon path,
-  .gear-back path,
-  .plan-item-icon path,
-  .plan-mini-item path {
+.launcher-icon path,
+.weather-day path,
+.gear-tile-icon path,
+.gear-back path,
+.applicator-tile path,
+.phase-nav path,
+.plan-item-icon path,
+.plan-mini-item path {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;

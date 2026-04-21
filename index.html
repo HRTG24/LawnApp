@@ -35,7 +35,7 @@
           <div>
             <h1 id="view-title">Outdoor Ops</h1>
           </div>
-          <button class="home-button" type="button" data-home data-theme-toggle aria-label="Home">
+          <button class="home-button" type="button" data-home aria-label="Home">
             <span data-icon="mark"></span>
           </button>
         </header>
@@ -52,6 +52,7 @@
               <section class="weather-panel" aria-labelledby="weather-heading">
                 <h3 id="weather-heading">3-day outlook</h3>
                 <div class="weather-grid" id="weather-grid"></div>
+                <div class="hourly-panel" id="hourly-panel" aria-live="polite"></div>
               </section>
 
               <nav class="launcher-grid" aria-label="Primary sections">
@@ -78,12 +79,16 @@
           <section class="view" id="plan-view" data-view="plan" aria-labelledby="plan-heading">
             <h2 class="visually-hidden" id="plan-heading">Plan</h2>
 
-            <section class="plan-phase-card" id="plan-phase-card"></section>
+            <section class="plan-phase-card" id="plan-phase-card">
+              <button class="phase-nav" type="button" data-plan-prev aria-label="Previous phase"></button>
+              <div id="plan-phase-copy"></div>
+              <button class="phase-nav" type="button" data-plan-next aria-label="Next phase"></button>
+            </section>
 
             <section class="plan-block" aria-labelledby="plan-priority-heading">
               <div class="plan-block-head">
-                <span class="label">This phase</span>
-                <h3 id="plan-priority-heading">What matters now</h3>
+                <span class="label">Focus</span>
+                <h3 id="plan-priority-heading">Focus</h3>
               </div>
               <div class="plan-item-list" id="plan-priority-list"></div>
             </section>
@@ -92,24 +97,21 @@
               <section class="plan-block compact" aria-labelledby="plan-trigger-heading">
                 <div class="plan-block-head">
                   <span class="label">Watch</span>
-                  <h3 id="plan-trigger-heading">Triggers</h3>
+                  <h3 id="plan-trigger-heading">Watch</h3>
                 </div>
                 <div class="plan-mini-list" id="plan-trigger-list"></div>
               </section>
 
               <section class="plan-block compact" aria-labelledby="plan-buy-heading">
                 <div class="plan-block-head">
-                  <span class="label">Stage</span>
-                  <h3 id="plan-buy-heading">Buy ahead</h3>
+                  <span class="label">Prep</span>
+                  <h3 id="plan-buy-heading">Prep</h3>
                 </div>
                 <div class="plan-mini-list" id="plan-buy-list"></div>
               </section>
             </div>
 
-            <details class="drawer plan-timeline-drawer">
-              <summary>Seasonal progression</summary>
-              <div class="plan-timeline" id="plan-timeline-list"></div>
-            </details>
+            <div class="phase-progress" id="plan-phase-progress" aria-label="Seasonal phases"></div>
           </section>
 
           <section class="view" id="gear-view" data-view="gear" aria-labelledby="gear-heading">
